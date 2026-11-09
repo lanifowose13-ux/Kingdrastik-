@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paper Trader</title>
+<style>
+:root{--bg:#f3f5f4;--sf:#fff;--ink:#14201c;--mu:#66756f;--ln:#dde3e0;--up:#0f8a5f;--dn:#c8372d;--ac:#16443a;--acx:#fff;--hl:#e9f1ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1512;--sf:#16201c;--ink:#e6efeb;--mu:#8a9c95;--ln:#263530;--up:#3ecf92;--dn:#f0645a;--ac:#3ecf92;--acx:#0e1512;--hl:#1c2b25;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1512;--sf:#16201c;--ink:#e6efeb;--mu:#8a9c95;--ln:#263530;--up:#3ecf92;--dn:#f0645a;--ac:#3ecf92;--acx:#0e1512;--hl:#1c2b25;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex Sans","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+h1{font:600 22px "IBM Plex Sans",system-ui,sans-serif;margin:0}
+.sub{color:var(--mu);font-size:12px}
+.stats{display:flex;flex-wrap:wrap;gap:6px 26px}
+.stat b{display:block;font-size:20px;font-weight:600}.stat span{color:var(--mu);font-size:12px}
+.up{color:var(--up)}.dn{color:var(--dn)}
+.grid{display:grid;grid-template-columns:260px 1fr 270px;gap:12px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:8px;overflow:hidden}
+.ch{padding:10px 12px;border-bottom:1px solid var(--ln);display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid var(--ln);cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;font:inherit;text-align:left}
+.row:hover{background:var(--hl)}.row.on{background:var(--hl);box-shadow:inset 3px 0 var(--ac)}
+.row small{display:block;color:var(--mu);font-size:11px}.row .r{text-align:right}
+.tabs button,.seg button{border:1px solid var(--ln);background:none;color:var(--mu);padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+.tabs button.on,.seg button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.seg{display:flex}.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0}.seg button+button{margin-left:-1px}
+canvas{display:block;width:100%;height:100%}
+#cw{position:relative;flex:1;min-height:300px}#cw canvas{position:absolute;inset:0}
+.grid>section:nth-child(2),.grid>section:nth-child(3){display:flex;flex-direction:column}.grid>section:nth-child(3) .trade{flex:none}#rt{flex:1;overflow:auto}
+.big{padding:12px 14px 0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.big b{font-size:26px}
+.trade{padding:12px;display:grid;gap:10px}
+.trade label{color:var(--mu);font-size:12px}
+input[type=number],select{width:100%;padding:9px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.q{display:flex;gap:6px}.q button{flex:1;padding:5px;border:1px solid var(--ln);background:none;color:var(--mu);border-radius:6px;cursor:pointer;font:inherit;font-size:12px}
+.bs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bs button{padding:11px;border:0;border-radius:6px;font:600 14px inherit;font-family:inherit;color:#fff;cursor:pointer}
+.buy{background:var(--up)}.sell{background:var(--dn)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.kv{display:flex;justify-content:space-between;font-size:13px}.kv span:first-child{color:var(--mu)}
+#msg{min-height:20px;font-size:12px}
+.low{grid-column:1/-1}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}th{color:var(--mu);font-weight:500;font-size:12px}
+.empty{padding:22px;color:var(--mu);text-align:center}
+.news{padding:10px 12px;font-size:13px;display:grid;gap:6px}.news div{border-left:3px solid var(--ln);padding-left:8px}
+.tip{padding:10px 12px;background:var(--hl);font-size:12px;color:var(--mu)}
+.top{display:flex;gap:8px;align-items:center}
+.ghost{border:1px solid var(--ln);background:none;color:var(--ink);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer}
+.badge{background:var(--hl);border:1px solid var(--ln);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--mu)}button.badge{font:inherit;font-size:12px;cursor:pointer}.badge.follow{border-color:var(--ac);color:var(--ac)}
+details{border-bottom:1px solid var(--ln)}summary{padding:11px 14px;cursor:pointer;font-weight:600}.lb{padding:0 14px 12px;max-width:80ch}.lb p{margin:4px 0}.lb li{margin:3px 0}
+.tg{outline:3px solid var(--ac);outline-offset:3px;border-radius:8px}
+#tb{position:fixed;z-index:50;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100% - 24px));background:var(--sf);color:var(--ink);border:1px solid var(--ac);border-radius:10px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#tb.t{bottom:auto;top:calc(16px + env(safe-area-inset-top,0px))}#tb p{margin:6px 0 12px}
+.spk{width:56px;height:20px;flex:none;margin:0 10px}.row>div:first-child{min-width:0;flex:1}.row small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ords{display:grid;gap:6px;font-size:12px}.ords>div{display:flex;justify-content:space-between;align-items:center;gap:6px;border:1px dashed var(--ln);border-radius:6px;padding:6px 8px}
+.ords button{border:0;background:none;color:var(--dn);cursor:pointer;font:inherit;font-size:12px;padding:2px 4px}
+.alloc{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:12px 12px 8px;background:var(--ln)}.alloc span{display:block;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:4px 14px;padding:0 12px 10px;font-size:12px;color:var(--mu)}.leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.menu{position:relative;border:0}.menu summary{list-style:none;padding:6px 10px;font-weight:400;border:1px solid var(--ln);border-radius:6px}.menu summary::-webkit-details-marker{display:none}.menu[open] summary{border-color:var(--ac)}
+.menu>div{position:absolute;z-index:40;top:calc(100% + 6px);left:0;background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px;display:grid;gap:6px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.kbd{font-size:11px;color:var(--mu)}#cw{cursor:crosshair;touch-action:pan-y}
+@media(max-width:980px){.grid{grid-template-columns:1fr}.list{display:flex;overflow-x:auto}.list .row{min-width:220px;border-bottom:0;border-right:1px solid var(--ln)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div><h1>Paper Trader</h1><div class="sub">Practice investing with virtual tokens. Fictional companies, simulated prices, no real money.</div><div class="top" style="margin-top:8px;flex-wrap:wrap"><button class="ghost" id="tourbtn">Take the tour</button><button class="ghost" id="learnbtn">Learn the basics</button><details class="menu" id="sndmenu"><summary>Sound &amp; voice</summary><div><button class="ghost" id="sndbtn" aria-pressed="true">Sound: on</button><button class="ghost" id="psbtn" aria-pressed="true">Price sounds: on</button><button class="ghost" id="nbtn" aria-pressed="false">Narration: off</button><button class="ghost" id="exbtn">Explain now</button></div></details><button class="ghost" id="scbtn">Scan my simulation</button><button class="badge" id="sync" title="Syncs your portfolio between your devices">Sync: this device only</button></div></div>
+ <div class="stats">
+  <div class="stat"><span>Total value</span><b id="tv"></b></div>
+  <div class="stat"><span>Cash</span><b id="cash"></b></div>
+  <div class="stat"><span>Income received</span><b id="dv"></b></div>
+  <div class="stat"><span>Total profit / loss</span><b id="pl"></b></div>
+ </div>
+</header>
+<div class="card" id="brk" style="margin-bottom:12px;padding:10px 12px;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap" aria-live="polite"><span class="badge" id="bt">REAL NEWS</span><div style="flex:1;min-width:220px"><b id="bh"></b><div class="sub" id="bx"></div><div id="bc" style="font-size:12px;margin-top:2px"></div></div><div class="top"><button class="ghost" id="bp" aria-label="Previous story">‹</button><button class="ghost" id="bpa">Pause</button><button class="ghost" id="bn" aria-label="Next story">›</button><button class="ghost" id="bgo">Try it here</button></div></div>
+<div class="grid">
+ <section class="card"><div class="ch">Market <span class="badge" id="clock"></span></div><div class="list" id="list"></div>
+  <div class="ch" style="border-top:1px solid var(--ln)">Market news</div><div class="news" id="news"></div></section>
+ <section class="card">
+  <div class="ch"><div class="tabs seg" id="mode"><button data-m="a" class="on">Asset price</button><button data-m="pf">My portfolio</button><button data-m="ix">Market index</button></div>
+   <div class="top"><div class="seg" id="rng"><button data-r="60">60</button><button data-r="150" class="on">150</button><button data-r="400">Max</button></div>
+   <select id="speed" style="width:auto" aria-label="Speed"><option value="2000">Slow</option><option value="1000" selected>Normal</option><option value="300">Fast</option><option value="0">Paused</option></select></div></div>
+  <div class="big"><b id="bigp"></b><span id="bigc"></span><span class="sub" id="bigname"></span></div>
+  <div id="cw"><canvas id="cv"></canvas></div>
+  <div class="tip" id="tip"></div>
+ </section>
+ <section class="card"><div class="ch" id="tt">Trade</div>
+  <div class="trade">
+   <div><label for="qty">Quantity (shares)</label><input id="qty" type="number" min="1" step="1" value="10" inputmode="numeric"></div>
+   <div><label>Order type</label><div class="seg" id="otype" style="margin-top:4px"><button data-o="m" class="on">Market</button><button data-o="l">Limit</button><button data-o="st">Stop</button></div></div>
+   <div id="trigw" hidden><label for="trig" id="trigl">Limit price</label><input id="trig" type="number" min="0.01" step="0.01" inputmode="decimal"><div class="sub" id="trigh" style="margin-top:4px"></div></div>
+   <div class="q"><button data-p="25">25%</button><button data-p="50">50%</button><button data-p="100">Max</button></div>
+   <div class="kv"><span>Bid / ask price</span><span id="tp"></span></div>
+   <div class="kv"><span>Fee (0.1%)</span><span id="tf"></span></div>
+   <div class="kv"><span>Order total</span><b id="tt2"></b></div>
+   <div class="kv"><span>You own</span><span id="own"></span></div>
+   <div class="bs"><button class="buy" id="buy">Buy</button><button class="sell" id="sell">Sell</button></div>
+   <label for="swapto">Swap the shares above into another asset</label>
+   <div style="display:grid;grid-template-columns:1fr auto;gap:6px"><select id="swapto"></select><button class="ghost" id="swapbtn">Swap shares</button></div>
+   <div id="msg" role="status"></div>
+   <div class="ords" id="ords"></div>
+   <button class="sell" id="sellall" style="padding:11px;border:0;border-radius:6px;font:600 14px inherit;font-family:inherit;color:#fff;cursor:pointer">Sell everything</button>
+   <button class="ghost" id="topup">Add ◎3,000 tokens</button>
+   <button class="ghost" id="reset">Reset simulation</button>
+   <div class="kbd">Keys: B buy · S sell · ← → change asset · Space pause</div>
+  </div><div class="ch" style="border-top:1px solid var(--ln)">Latest activity</div><div class="news" id="rt"></div></section>
+ <section class="card low">
+  <div class="ch"><div class="tabs seg" id="tabs"><button data-t="h" class="on">Holdings</button><button data-t="x">Transaction history</button></div></div>
+  <div class="tw" id="tbl"></div>
+ </section>
+ <section class='card low' id='lab'><div class='ch' style='overflow-x:auto'><div class='tabs seg' id='sltabs'><button data-l='bh' class='on'>Buy and hold</button><button data-l='ix'>Index investing</button><button data-l='fa'>Fundamental analysis</button><button data-l='ta'>Technical analysis</button><button data-l='dt'>Day trading</button><button data-l='au'>Auto-invest on news</button><button data-l='rw'>Real-world costs</button><button data-l='in'>Income assets</button></div></div><div class='tip' id='sb'></div><div class='lb' id='sl' style='padding:12px 14px;max-width:none'></div></section>
+ <section class="card low" id="scan" hidden></section>
+ <section class="card low" id="biz"><div class="ch">Business Empire <span class="badge" id="bm">Normal times</span></div><div class="tip">Spend tokens on businesses that pay you a salary every tick. Move the salary into your investing cash to grow your portfolio. World events hit your income too: a recession or health scare causes a slump, and a strong jobs report brings a boom.</div><div style="padding:12px 14px;display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center"><div class="stat"><span>Salary wallet</span><b id="bw"></b></div><div class="stat"><span>Salary per tick</span><b id="br"></b></div><div class="stat"><span>Earned so far</span><b id="bl"></b></div><div class="top"><button class="ghost" id="bsh">Work a shift</button><button id="bmv" style="background:var(--up);color:#fff;border:0;border-radius:6px;padding:8px 12px;font:inherit;cursor:pointer">Move salary to investing</button></div></div><div class="sub" id="bnw" style="padding:0 14px 8px"></div><div id="bz" style="display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));padding:0 14px 14px"></div></section>
+ <section class="card low" id="events"><div class="ch">World events <span class="top"><select id="evsel" style="width:auto;max-width:46vw" aria-label="Choose an event"></select><button class="ghost" id="evgo">Trigger event</button><button class="ghost" id="autobtn">Auto-invest: off</button></span></div><div class="tip">Real-world events move whole sectors, not single companies. They also happen at random while the market runs. Size and direction here are simplified for learning, and real reactions vary.</div><div class="news" id="evs"></div></section>
+ <section class="card low" id="learn"><div class="ch">Learn the basics</div><div id="lc"></div></section>
+</div>
+</div>
+<div id="toast" role="status" style="display:none;position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));background:var(--sf);color:var(--ink);border:1px solid var(--ac);border-radius:8px;padding:10px 14px;z-index:60;width:min(420px,calc(100% - 24px));box-shadow:0 8px 30px rgba(0,0,0,.25)"></div>
+<div id="tour" hidden><div id="tb"></div></div>
+<script>
+const $=id=>document.getElementById(id),START=10000,FEE=.001,KEY='paper-trader-v1';
+const D=[
+{s:'NOVA',n:'Nova Technologies',p:182,v:.0045,b:1.3,d:.00003},
+{s:'GRID',n:'Gridline Energy',p:64,v:.003,b:.8,d:.00001},
+{s:'MEDX',n:'MedaxHealth',p:121,v:.0035,b:.6,d:.00002},
+{s:'BOLT',n:'Bolt Motors',p:240,v:.007,b:1.8,d:.00002},
+{s:'HARV',n:'Harvest Foods',p:48,v:.002,b:.4,d:.00001},
+{s:'ORBT',n:'Orbit Aerospace',p:96,v:.0055,b:1.5,d:.00003},
+{s:'FIRM',n:'Firmament Bank',p:73,v:.003,b:1.0,d:.00001},
+{s:'BIOZ',n:'Biozyme Labs',p:18,v:.011,b:1.2,d:0},
+{s:'GOLD',n:'Goldvault Bullion Fund',p:150,v:.0025,b:.1,d:.00002},
+{s:'GILT',n:'Steady Bond Fund',p:100,v:.0012,b:-.1,d:.00001},
+{s:'RENT',n:'Hearth Property Trust',p:60,v:.0028,b:.6,d:.00001},
+{s:'SAVE',n:'Cash Savings Account',p:100,v:.0001,b:0,d:0,nd:1}];
+const DIV=90,YD={GRID:.012,MEDX:.006,HARV:.01,FIRM:.014,GILT:.0105,RENT:.01375,SAVE:.00875};D.forEach(d=>d.y=YD[d.s]||0);
+const SEC={NOVA:'Technology',GRID:'Energy',MEDX:'Healthcare',BOLT:'Autos',HARV:'Food',ORBT:'Aerospace & defence',FIRM:'Banking',BIOZ:'Biotech',GOLD:'Commodities',GILT:'Bonds',RENT:'Property',SAVE:'Savings'};
+const SPR={NOVA:.25,GRID:.2,MEDX:.3,BOLT:.2,HARV:.15,ORBT:.35,FIRM:.2,BIOZ:.9,GOLD:.1,GILT:.08,RENT:.4,SAVE:.02},DEP={NOVA:4000,GRID:5000,MEDX:3500,BOLT:2500,HARV:5000,ORBT:3000,FIRM:4500,BIOZ:1200,GOLD:5000,GILT:8000,RENT:3000,SAVE:20000},TAXR=.2;
+const FUND={NOVA:{eps:6.1,g:18,de:'Low'},GRID:{eps:5.2,g:4,de:'High'},MEDX:{eps:5,g:7,de:'Medium'},BOLT:{eps:4.1,g:25,de:'High'},HARV:{eps:3.4,g:3,de:'Low'},ORBT:{eps:3,g:12,de:'High'},FIRM:{eps:6.2,g:5,de:'Medium'},BIOZ:{eps:.2,g:40,de:'Medium'},GOLD:{eps:0,g:0,de:'None'},GILT:{eps:0,g:0,de:'None'},RENT:{eps:0,g:0,de:'None'},SAVE:{eps:0,g:0,de:'None'}};
+const TIPS=['Diversifying across several assets reduces the damage if one of them falls.','Higher volatility means bigger swings in both directions. BIOZ and BOLT move the most here.','Every trade has a small fee, so frequent buying and selling quietly eats into returns.','Profit or loss is only "realised" when you sell. Until then it is an unrealised paper gain or loss.','Past price moves do not predict future ones. Short-term moves are mostly noise.','Never put everything into a single asset, even one that has been rising.','Dividends are paid from the company\'s value, so the price drops by the payout. The gain is the cash you receive, not free money.'];
+const UP=['{n} wins a major contract','{n} beats earnings forecasts','Analysts upgrade {n}'],DN=['{n} cuts its profit outlook','Regulator opens probe into {n}','{n} loses a key customer'];
+const randn=()=>{let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2832*Math.random())};
+const f=(n,d=2)=>n.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d});
+const T=n=>'◎'+f(n),sg=n=>(n>=0?'+':'−')+f(Math.abs(n)),pc=n=>(n>=0?'+':'−')+f(Math.abs(n))+'%';
+let S,sel='NOVA',mode='a',range=150,tab='h',timer,tick=0,tipI=0,follower=false,TA=false,labDirty=true,slTab='bh';
+function fresh(){HV=null;const px={},open={};D.forEach(d=>{let a=[d.p];for(let i=0;i<199;i++)a.unshift(a[0]/(1+d.v*randn()));px[d.s]=a;open[d.s]=a[0]});return{cash:START,pos:{},tx:[],pf:[START],px,open,news:[],t:0,dvt:0,p0:Object.fromEntries(D.map(d=>[d.s,px[d.s][px[d.s].length-1]]))}}
+function load(){try{const j=localStorage.getItem(KEY);if(j){const o=JSON.parse(j);if(o&&o.px&&o.cash!=null)return fixS(o)}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncPush()}
+const P=s=>S.px[s][S.px[s].length-1];
+const hv=()=>Object.keys(S.pos).reduce((a,s)=>a+S.pos[s].q*P(s),0);
+const total=()=>S.cash+hv();
+function step(){
+ const m=randn()*.0015;S.t++;
+ D.forEach(d=>{const a=S.px[d.s];let p=a[a.length-1]*(1+d.d+d.b*m+d.v*randn());a.push(Math.max(1,p));if(a.length>400)a.shift()});
+ if(Math.random()<.02){const d=D[Math.floor(Math.random()*8)],up=Math.random()<.5,a=S.px[d.s],sh=(.02+Math.random()*.05)*(up?1:-1);
+  a[a.length-1]=Math.max(1,a[a.length-1]*(1+sh));const L=up?UP:DN;
+  S.news.unshift({s:d.s,up,t:L[Math.floor(Math.random()*3)].replace('{n}',d.n),c:sh*100});S.news=S.news.slice(0,4);snd('news');talk(`News: ${S.news[0].t}. That moved the price about ${f(Math.abs(sh*100),1)} percent ${up?'up':'down'} straight away. Company news can change prices suddenly, and nobody can predict when it will come.`)}
+ if(S.t%DIV==0)D.forEach(d=>{if(!d.y)return;const a=S.px[d.s],dps=a[a.length-1]*d.y,o=S.pos[d.s];if(!d.nd)a[a.length-1]=Math.max(1,a[a.length-1]-dps);
+  if(o){const gross=o.q*dps,dtx=RL('tx')?gross*.1:0,tot=gross-dtx;if(dtx){S.tax=S.tax||{paid:0,credit:0};S.tax.paid+=dtx}S.cash+=tot;S.dvt=(S.dvt||0)+tot;S.tx.unshift({t:S.t,b:2,s:d.s,q:o.q,p:dps,f:0,tot,r:tot});snd('div');talk(`${d.n} paid a dividend of ${f(dps)} tokens per share. You own ${o.q} shares, so ${f(tot)} tokens went into your cash. The share price dropped by the same amount, so a dividend moves value from the price into your cash rather than creating new money.`,1)}
+  S.news.unshift({s:d.s,up:true,t:d.n+' pays a dividend of ◎'+f(dps)+' per share (the price drops by the same amount)',c:0});S.news=S.news.slice(0,4)});
+(S.pend||[]).forEach(q=>{if(q.n>0){const a=S.px[q.s];a[a.length-1]=Math.max(1,a[a.length-1]*(1+q.p/100));q.n--}});S.pend=(S.pend||[]).filter(q=>q.n>0);
+ checkOrders();bizTick();S.pf.push(total());if(S.pf.length>400)S.pf.shift();
+ if(++tick%5==0)save();render()}
+function setTimer(){clearInterval(timer);const v=+$('speed').value;if(v&&!follower)timer=setInterval(step,v)}
+function renderStats(){const t=total(),pl=t-START-(S.dep||0);$('tv').textContent=T(t);$('cash').textContent=T(S.cash);$('dv').textContent=T(S.dvt||0);
+ $('pl').innerHTML=`<span class="${pl>=0?'up':'dn'}">${sg(pl)} (${pc(pl/(START+(S.dep||0))*100)})</span>`;
+ const h=Math.floor(S.t/60)+9,mm=S.t%60;$('clock').textContent=`Sim day ${1+Math.floor(S.t/390)} · tick ${S.t}`}
+function renderList(){$('list').innerHTML=D.map(d=>{const p=P(d.s),c=(p/S.open[d.s]-1)*100;
+ return `<button class="row ${d.s==sel?'on':''}" data-s="${d.s}"><div><b>${d.s}</b><small>${d.n}${d.y?' · '+f(d.y*400,1)+'% yield':''}</small></div><div class="r"><b>${f(p)}</b><small class="${c>=0?'up':'dn'}">${pc(c)}</small></div></button>`}).join('')}
+function renderNews(){renderEvents();$('news').innerHTML=S.news.length?S.news.map(n=>`<div style="border-color:var(${n.up?'--up':'--dn'})"><b>${n.s}</b> ${n.t}</div>`).join(''):'<div class="sub">No headlines yet. Big news can move a price suddenly.</div>'}
+function renderTrade(){if(swapFor!=sel)fillSwap();const p=P(sel),q=Math.max(0,Math.floor(+$('qty').value)||0),v=xp(sel,true)*q,own=(S.pos[sel]||{q:0}).q;
+ $('tt').textContent='Trade '+sel;$('tp').textContent=RL('sp')?`${f(xp(sel,false))} / ${f(xp(sel,true))}`:T(p);$('tf').textContent=T(v*FEE);$('tt2').textContent=T(v*(1+FEE));$('own').textContent=own+' shares'}
+function renderBig(){let a,name;if(mode=='pf'){a=S.pf;name='Portfolio value (cash + holdings)'}else if(mode=='ix'){a=idxS();name='Market index: equal-weight blend of all twelve assets, 100 at the start'}else{a=S.px[sel];name=D.find(d=>d.s==sel).n+' · '+SEC[sel]}
+ const s=a.slice(-range),l=s[s.length-1],c=(l/s[0]-1)*100;$('bigp').textContent=(mode=='pf'?'◎':'')+f(l);
+ $('bigc').innerHTML=`<span class="${c>=0?'up':'dn'}">${pc(c)}</span>`;$('bigname').textContent=name}
+function renderTable(){let h;
+ if(tab=='h'){const k=Object.keys(S.pos);h=k.length?`<table><tr><th>Asset</th><th>Shares</th><th>Avg cost</th><th>Price</th><th>Value</th><th>Profit / loss</th><th>%</th></tr>`+k.map(s=>{const o=S.pos[s],p=P(s),pl=(p-o.c)*o.q;
+  return `<tr class="row" style="display:table-row" data-s="${s}"><td><b>${s}</b></td><td>${o.q}</td><td>${f(o.c)}</td><td>${f(p)}</td><td>${f(p*o.q)}</td><td class="${pl>=0?'up':'dn'}">${sg(pl)}</td><td class="${pl>=0?'up':'dn'}">${pc((p/o.c-1)*100)}</td></tr>`}).join('')+'</table>':'<div class="empty">No holdings yet. Pick an asset, enter a quantity and press Buy.</div>'}
+ else h=S.tx.length?`<table><tr><th>Time</th><th>Side</th><th>Asset</th><th>Shares</th><th>Price</th><th>Fee</th><th>Total</th><th>Realised P/L</th></tr>`+S.tx.map(x=>`<tr><td>Tick ${x.t}</td><td class="${x.b?'up':'dn'}">${x.b==3?'Top-up':x.b==2?'Dividend':(x.b?'Buy':'Sell')+(x.a?' (auto)':x.o=='l'?' (limit)':x.o=='st'?' (stop)':'')}</td><td>${x.s}</td><td>${x.q}</td><td>${f(x.p)}</td><td>${f(x.f)}</td><td>${f(x.tot)}</td><td class="${x.r>=0?'up':'dn'}">${x.b==1||x.b==3?'–':sg(x.r)}</td></tr>`).join('')+'</table>':'<div class="empty">No transactions yet.</div>';
+ $('tbl').innerHTML=h}
+function chart(){const c=$('cv'),r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;
+ const x=c.getContext('2d');x.scale(dpr,dpr);const W=r.width,H=r.height,st=getComputedStyle(document.documentElement);
+ const col=n=>st.getPropertyValue(n).trim();
+ const a=(mode=='pf'?S.pf:mode=='ix'?idxS():S.px[sel]).slice(-range);let mn=Math.min(...a),mx=Math.max(...a);if(mode=='pf'){mn=Math.min(mn,START);mx=Math.max(mx,START)}
+ const pad=(mx-mn)*.12||1;mn-=pad;mx+=pad;const L=8,R=60,Tp=10,B=14,X=i=>L+(W-L-R)*(i/Math.max(1,a.length-1)),Y=v=>Tp+(H-Tp-B)*(1-(v-mn)/(mx-mn));
+ const up=a[a.length-1]>=(mode=='pf'?START:a[0]),lc=col(up?'--up':'--dn');
+ x.font='11px system-ui';x.fillStyle=col('--mu');x.strokeStyle=col('--ln');x.lineWidth=1;
+ for(let i=0;i<5;i++){const v=mn+(mx-mn)*i/4,y=Y(v);x.beginPath();x.moveTo(L,y);x.lineTo(W-R,y);x.stroke();x.fillText(f(v,mode=='pf'?0:2),W-R+6,y+4)}
+ if(mode=='pf'){x.setLineDash([4,4]);x.beginPath();x.moveTo(L,Y(START));x.lineTo(W-R,Y(START));x.strokeStyle=col('--mu');x.stroke();x.setLineDash([])}
+ x.beginPath();a.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.strokeStyle=lc;x.lineWidth=2;x.lineJoin='round';x.stroke();
+ x.lineTo(X(a.length-1),H-B);x.lineTo(X(0),H-B);x.closePath();const g=x.createLinearGradient(0,Tp,0,H);g.addColorStop(0,lc+'33');g.addColorStop(1,lc+'00');x.fillStyle=g;x.fill();
+ if(TA&&mode=='a'){const fl=S.px[sel];[[20,'--ac'],[50,'--mu']].forEach(([n,c])=>{const s=sma(fl,n).slice(-a.length);x.beginPath();let st=0;s.forEach((v,i)=>{if(v==null)return;const qx=X(i),qy=Y(Math.min(mx,Math.max(mn,v)));if(st)x.lineTo(qx,qy);else{x.moveTo(qx,qy);st=1}});x.strokeStyle=col(c);x.lineWidth=1.5;x.setLineDash([5,3]);x.stroke();x.setLineDash([])})}
+ const ly=Y(a[a.length-1]);x.fillStyle=lc;x.fillRect(W-R+2,ly-9,R-4,18);x.fillStyle='#fff';x.fillText(f(a[a.length-1],mode=='pf'?0:2),W-R+6,ly+4);
+ if(mode=='a'){const o=S.pos[sel];if(o&&o.c>=mn&&o.c<=mx){x.setLineDash([2,3]);x.strokeStyle=col('--ac');x.beginPath();x.moveTo(L,Y(o.c));x.lineTo(W-R,Y(o.c));x.stroke();x.setLineDash([]);x.fillStyle=col('--ac');x.fillText('your avg cost',L+4,Y(o.c)-4)}}
+ (S.ord||[]).forEach(o=>{if(mode!='a'||o.s!=sel||o.px<mn||o.px>mx)return;const y=Y(o.px),oc=col(o.b?'--up':'--dn');x.setLineDash([6,4]);x.strokeStyle=oc;x.lineWidth=1;x.beginPath();x.moveTo(L,y);x.lineTo(W-R,y);x.stroke();x.setLineDash([]);x.fillStyle=oc;x.fillText(`${o.k=='l'?'limit':'stop'} ${o.b?'buy':'sell'} ×${o.q}`,L+4,y-4)});
+ if(HV!=null&&a.length>1){const i=Math.max(0,Math.min(a.length-1,Math.round((HV-L)/(W-L-R)*(a.length-1)))),hx=X(i),hy=Y(a[i]);x.strokeStyle=col('--mu');x.lineWidth=1;x.setLineDash([3,3]);x.beginPath();x.moveTo(hx,Tp);x.lineTo(hx,H-B);x.stroke();x.setLineDash([]);x.fillStyle=lc;x.beginPath();x.arc(hx,hy,4,0,6.2832);x.fill();
+  const ago=a.length-1-i,lab=`${mode=='pf'?'◎':''}${f(a[i],mode=='pf'?0:2)} · ${ago?ago+' ticks ago':'now'}`,tw=x.measureText(lab).width+12,bx=Math.min(Math.max(L,hx-tw/2),W-R-tw);x.fillStyle=col('--sf');x.strokeStyle=col('--ln');x.fillRect(bx,Tp,tw,18);x.strokeRect(bx,Tp,tw,18);x.fillStyle=col('--ink');x.fillText(lab,bx+6,Tp+13)}}
+function render(){if(labDirty||S.t%5==0){labDirty=false;renderLab()}renderStats();renderRecent();bizUpd();renderList();renderBig();renderTrade();renderTable();chart()}
+function say(t,ok){if(ok===undefined){snd('err');talk(t,1)}$('msg').innerHTML=`<span class="${ok?'up':'dn'}">${t}</span>`}
+function trade(buy){if(follower)takeOver();let q=Math.floor(+$('qty').value);if(!(q>=1))return say('Enter a whole number of shares, 1 or more.');
+ const cap=maxq(sel,buy);let part='';if(q>cap&&(buy||(S.pos[sel]&&S.pos[sel].q>=q))){part=` Only ${cap} of ${q} shares could be filled at once because ${sel} is thinly traded. Order again for the rest.`;q=cap}
+ const p=xp(sel,buy),v=p*q,fee=v*FEE;
+ if(buy){if(v+fee>S.cash)return say(`Not enough cash. You need ${T(v+fee)} but have ${T(S.cash)}.`);
+  const o=S.pos[sel]||{q:0,c:0,t0:S.t};o.c=(o.c*o.q+v)/(o.q+q);o.q+=q;S.pos[sel]=o;S.cash-=v+fee;
+  S.tx.unshift({t:S.t,b:1,s:sel,q,p,f:fee,tot:v+fee,r:0});snd('buy');say(`Bought ${q} ${sel} at ${f(p)}.${part}`,1);talk(`You bought ${q} shares of ${sel} at ${f(p)} tokens each. The order cost ${f(v+fee)} tokens including a fee of ${f(fee)}. Your average cost is now ${f(o.c)}, so you profit if the price rises above that and lose if it falls below. You have ${f(S.cash)} tokens left.`,1)}
+ else{const o=S.pos[sel];if(!o||o.q<q)return say(`You only own ${o?o.q:0} shares of ${sel}.`);
+  const r0=(p-o.c)*q-fee,tax=taxOn(r0),r=r0-tax;o.q-=q;if(!o.q)delete S.pos[sel];S.cash+=v-fee-tax;
+  S.tx.unshift({t:S.t,b:0,s:sel,q,p,f:fee,tot:v-fee-tax,r,tx:tax});snd(r>=0?'sellwin':'sellloss');say(`Sold ${q} ${sel} at ${f(p)}. Realised ${sg(r)}${tax?', after '+T(tax)+' tax':''}.${part}`,r>=0);talk(`You sold ${q} shares of ${sel} at ${f(p)} tokens each. After the fee, that locked in a ${r>=0?'profit':'loss'} of ${f(Math.abs(r))} tokens. It is realised, because you sold.${tax?' '+f(tax)+' tokens went to capital gains tax.':''}${part} Your cash is now ${f(S.cash)} tokens.`,1)}
+ S.pf[S.pf.length-1]=total();labDirty=true;lastPush=0;save();render()}
+var swapFor;
+function fillSwap(){swapFor=sel;$('swapto').innerHTML=D.filter(d=>d.s!=sel).map(d=>`<option value="${d.s}">${d.s} (${d.n})</option>`).join('')}
+function swapShares(){if(follower)takeOver();const q=Math.floor(+$('qty').value),to=$('swapto').value,o=S.pos[sel];
+ if(!(q>=1))return say('Enter a whole number of shares to swap.');if(!o||o.q<q)return say(`You only own ${o?o.q:0} shares of ${sel}.`);
+ const p1=xp(sel,false),p2=xp(to,true),v1=p1*q,f1=v1*FEE,tax=taxPeek((p1-o.c)*q-f1),net=v1-f1-tax,n=Math.min(Math.floor(net/(p2*(1+FEE))),maxq(to,true));
+ if(n<1)return say(`${q} shares of ${sel} are worth too little to buy one share of ${to}.`);
+ const v2=p2*n,f2=v2*FEE,r0=(p1-o.c)*q-f1,r=r0-taxOn(r0);
+ o.q-=q;if(!o.q)delete S.pos[sel];S.cash+=net;S.tx.unshift({t:S.t,b:0,s:sel,q,p:p1,f:f1,tot:net,r});
+ S.cash-=v2+f2;const t=S.pos[to]||{q:0,c:0};t.c=(t.c*t.q+v2)/(t.q+n);t.q+=n;S.pos[to]=t;S.tx.unshift({t:S.t,b:1,s:to,q:n,p:p2,f:f2,tot:v2+f2,r:0});
+ S.pf[S.pf.length-1]=total();lastPush=0;save();render();snd('buy');
+ say(`Swapped ${q} ${sel} into ${n} ${to}. Realised ${sg(r)} on ${sel}.`,1);
+ talk(`You swapped ${q} shares of ${sel} for ${n} shares of ${to}. Selling ${sel} locked in a ${r>=0?'profit':'loss'} of ${f(Math.abs(r))} tokens, and you paid fees on both trades, ${f(f1+f2)} tokens in total. Swapping keeps you invested but costs two fees, so only switch when you have a reason.`,1)}
+$('swapbtn').onclick=swapShares;
+$('topup').onclick=()=>{if(follower)takeOver();S.cash+=3000;S.dep=(S.dep||0)+3000;S.tx.unshift({t:S.t,b:3,s:'Cash',q:'–',p:0,f:0,tot:3000,r:0});S.pf[S.pf.length-1]=total();lastPush=0;save();render();snd('div');
+ say('Added ◎3,000 tokens. Profit and loss still count from the total you have put in.',1);talk('You added 3,000 tokens to your cash. Profit and loss are still measured against everything you have put in, so a top-up does not count as a gain.',1)};
+let saT=0;
+function sellAll(){if(follower)takeOver();const ks=Object.keys(S.pos);if(!ks.length)return say('You have nothing to sell yet.');
+ let cash=0,fees=0,real=0,taxT=0,part=0;ks.forEach(s=>{const o=S.pos[s],q=Math.min(o.q,maxq(s,false)),p=xp(s,false),v=p*q,fee=v*FEE,r0=(p-o.c)*q-fee,tax=taxOn(r0),r=r0-tax;if(q<o.q)part++;cash+=v-fee-tax;fees+=fee;taxT+=tax;real+=r;S.tx.unshift({t:S.t,b:0,s,q,p,f:fee,tot:v-fee-tax,r,tx:tax});o.q-=q;if(!o.q)delete S.pos[s]});
+ S.cash+=cash;S.pf[S.pf.length-1]=total();lastPush=0;save();render();
+ snd(real>=0?'sellwin':'sellloss');say(`Sold all ${ks.length} holdings for ${T(cash)}. Realised ${sg(real)}.${taxT?' Tax paid '+T(taxT)+'.':''}${part?' Some positions were only partly sold because the market is thin. Sell again to finish.':''}`,real>=0);
+ talk(`You sold everything: ${ks.join(', ')}. After ${f(fees)} tokens in fees, that locked in a ${real>=0?'profit':'loss'} of ${f(Math.abs(real))} tokens. You are now fully in cash with ${f(S.cash)} tokens, so market moves no longer change your value.`,1)}
+$('sellall').onclick=()=>{const b=$('sellall');if(!Object.keys(S.pos).length){say('You have nothing to sell yet.');return}
+ if(b.dataset.arm){clearTimeout(saT);b.dataset.arm='';b.textContent='Sell everything';sellAll();return}
+ b.dataset.arm='1';b.textContent='Tap again to confirm: sell all';saT=setTimeout(()=>{b.dataset.arm='';b.textContent='Sell everything'},4000)};
+$('buy').onclick=()=>trade(1);$('sell').onclick=()=>trade(0);$('qty').oninput=renderTrade;
+document.querySelectorAll('.q button').forEach(b=>b.onclick=()=>{const p=+b.dataset.p/100,pr=P(sel);
+ const mxb=Math.floor(S.cash/(pr*(1+FEE))),own=(S.pos[sel]||{q:0}).q;$('qty').value=Math.max(1,Math.floor(Math.max(mxb,own)*p)||1);renderTrade()});
+document.addEventListener('click',e=>{const r=e.target.closest('[data-s]');if(r){snd('sel');sel=r.dataset.s;talk(describeAsset(sel),1);mode='a';document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m=='a'));render()}});
+$('mode').onclick=e=>{const m=e.target.dataset.m;if(!m)return;snd('tab');mode=m;talk(m=='pf'?'Showing your total portfolio value: cash plus the current value of everything you hold. The dashed line is your starting 10,000 tokens, so above it means you are in profit.':m=='ix'?'Showing the market index: an equal-weight blend of all twelve assets, starting at 100.':'Showing the price of '+sel+'.',1);document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b===e.target));render()};
+$('rng').onclick=e=>{const r=e.target.dataset.r;if(!r)return;snd('tab');range=+r;talk('Showing the last '+(r==400?'400, the maximum,':r)+' price updates. Each update is one simulated minute.',1);document.querySelectorAll('#rng button').forEach(b=>b.classList.toggle('on',b===e.target));render()};
+$('tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;snd('tab');tab=t;talk(t=='h'?'Holdings: what you own, your average cost, and unrealised profit or loss, which only becomes real when you sell.':'Transaction history: every buy, sell and dividend, with fees and realised profit or loss.',1);document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b===e.target));renderTable()};
+$('speed').onchange=setTimer;
+$('reset').onclick=()=>{if(confirm('Reset everything and start again with ◎10,000?')){S=fresh();tick=0;save();say('Simulation reset.',1);renderNews();render()}};
+addEventListener('resize',chart);if(window.ResizeObserver)new ResizeObserver(()=>chart()).observe($('cw'));
+function renderRecent(){const el=$('rt');if(!el)return;const l=S.tx.filter(x=>x.b!=3).slice(0,6);el.innerHTML=l.length?l.map(x=>`<div style='border-color:var(${x.b==0?'--dn':'--up'})'><b>${x.b==2?'Dividend':x.b?'Buy':'Sell'}</b> ${x.s} \u00d7${x.q} @ ${f(x.p)}<br><span class='sub'>tick ${x.t} \u00b7 ${T(x.tot)}</span></div>`).join(''):'<div class="sub">Your trades will appear here.</div>'}
+S=load();renderNews();
+const _s=step;step=function(){const a=S.px[sel],pv=a[a.length-1];if(!follower&&Math.random()<.006)fireEvent();_s();const b=S.px[sel],nx=b[b.length-1];if(PSND&&Math.abs(nx/pv-1)>.0015)snd(nx>pv?'up':'down');if(Math.abs(nx/pv-1)>.004&&Date.now()-lastTalkMove>25000){lastTalkMove=Date.now();talk(`${sel} just ${nx>pv?'rose':'fell'} ${f(Math.abs(nx/pv-1)*100,1)} percent in one update. Short-term moves like this are mostly random noise, so a single move is not a reason to trade.`)}renderNews();$('tip').textContent='Tip: '+TIPS[Math.floor(S.t/25)%TIPS.length]};
+$('tip').textContent='Tip: '+TIPS[0];render();setTimer();
+const LRN=[
+['1. What a stock is','<p>A share is a small slice of ownership in a company. Its price moves with supply and demand: more buyers than sellers pushes it up, the reverse pushes it down. Buyers and sellers are reacting to expectations about future profits, not just current ones.</p>'],
+['2. How you make or lose money','<ul><li><b>Capital gains:</b> you sell for more than you paid.</li><li><b>Dividends:</b> some companies pay out part of their profits. Here GRID, MEDX, HARV and FIRM pay every 90 ticks (a simulated quarter); the rest keep their profits to grow. The price drops by the payout on payment day, so it is not free money, but it adds cash to your total return.</li><li><b>Unrealised vs realised:</b> a paper gain or loss only becomes real when you sell. Holdings show unrealised; history shows realised.</li><li><b>Costs:</b> fees are small per trade but add up if you trade often.</li></ul>'],
+['3. Risk and return','<p>Higher potential return comes with higher risk. BIOZ and BOLT swing the most here; HARV and GRID are calmer.</p><ul><li><b>Volatility:</b> how much a price bounces around.</li><li><b>Drawdown:</b> the fall from a peak to a low. A 50% drop needs a 100% gain to recover.</li><li><b>Diversification:</b> spreading money so one bad outcome does not sink you.</li><li><b>Correlation:</b> assets that move together. All assets here share a market factor, so diversifying helps less in a broad fall, as in real crashes.</li></ul>'],
+['4. Position sizing','<p>Decide how much to put into each trade before placing it, and avoid risking more than a small slice of your total on one idea. Try it: put 100% into BIOZ, then split across five assets, and compare the portfolio chart.</p>'],
+['5. Reading the numbers','<ul><li><b>Price chart:</b> shows trend and volatility, but does not predict anything.</li><li><b>Percentage change:</b> a ◎1 rise on a ◎10 stock is far bigger than on a ◎200 stock.</li><li><b>Average cost:</b> your break-even price; it changes when you buy more at a different price.</li><li><b>Portfolio vs asset:</b> total value is cash plus holdings, so a rising stock you barely own barely matters.</li></ul>'],
+['6. Ways people approach investing','<ul><li><b>Buy and hold:</b> keep sound assets for years. The simplest approach.</li><li><b>Index investing:</b> buy a broad basket rather than picking winners.</li><li><b>Fundamental analysis:</b> judge earnings, debt and growth.</li><li><b>Technical analysis:</b> trade on chart patterns; evidence it works consistently is weak.</li><li><b>Day trading:</b> very hard to profit from after fees; most people lose money.</li></ul>'],
+['7. Common beginner mistakes','<ul><li>Treating a short-term rise as proof you were right.</li><li>Panic selling after a drop, or buying from fear of missing out.</li><li>Putting everything into one asset.</li><li>Overtrading and paying fees on every small move.</li><li>Investing money you cannot afford to lose.</li><li>Trusting tips, hype or promises of guaranteed returns.</li></ul>'],
+['8. A practice plan','<ol><li><b>Week 1:</b> buy and hold 4–5 assets, no trading. Notice how much is random noise.</li><li><b>Week 2:</b> concentrate in one volatile asset and compare your drawdown with Week 1.</li><li><b>Week 3:</b> trade actively, then compare results with Week 1 after fees.</li><li><b>Throughout:</b> write down why you made each trade, then review those notes after losses.</li></ol>'],
+['9. What this simulator does not teach','<ul><li>Real prices follow company news and the economy, not random numbers.</li><li>Real money is emotionally harder than tokens.</li><li>This simulator now models simple versions of taxes, spreads and thin markets (see Real-world costs in the Strategy lab), but real life adds settlement delays, platform fees and stress.</li></ul><p>Before using real money, learn the tax rules and low-cost account options where you live, and start only with an amount you could lose entirely.</p>'],
+['10. How world events move markets','<ul><li>Events hit sectors differently. Higher interest rates tend to hurt growth and biotech but help banks; an oil shock helps energy and hurts fuel-hungry industries; a health scare lifts healthcare and hurts travel.</li><li>Markets move on surprises. Prices already reflect what most people expect, so a result that merely meets expectations can barely move them.</li><li>The reaction is usually fast. By the time you read a headline, much of the move has often happened.</li><li>Events interact and effects fade or reverse, so one headline rarely tells you where a price goes next.</li><li>Use the World events panel to guess the winners and losers before you trigger an event, then compare. Do not treat the simulator sizes as predictions, because real reactions vary widely.</li></ul>'],
+['11. Assets that earn income','<ul><li><b>Savings:</b> pay interest and barely move in price. Safe, but the return is low and inflation can eat it.</li><li><b>Bonds:</b> pay regular interest. Their prices fall when interest rates rise and rise when rates fall.</li><li><b>Property:</b> a property trust collects rent and pays most of it out. It is sensitive to interest rates and the economy.</li><li><b>Dividend shares:</b> pay part of their profits, but the payout can be cut.</li><li><b>Gold:</b> pays nothing, but it often holds up when markets are scared.</li></ul><p>A high income percentage can signal high risk, so check why it is high. Reinvesting income lets it compound, and income is usually taxed. Nothing is guaranteed.</p>'],
+['12. Order types','<ul><li><b>Market order:</b> trades now at the current bid or ask. It always fills, but you do not control the exact price.</li><li><b>Limit order:</b> you set the worst price you will accept. A limit buy waits for the price to fall to your level, and a limit sell waits for it to rise. You control the price but might never be filled.</li><li><b>Stop-loss:</b> a stop sell placed below the current price. If the price falls to it, it sells to cap your loss. In a fast fall it can fill below your trigger, which traders call slippage.</li><li><b>Stop buy:</b> buys only once the price rises through a level. Trend followers use it.</li></ul><p>Try it: buy some BOLT, then place a stop sell about 3% below the current price and watch the line on the chart.</p>']];
+$('lc').innerHTML=LRN.map((l,i)=>`<details${i?'':' open'}><summary>${l[0]}</summary><div class="lb">${l[1]}</div></details>`).join('')+'<div class="tip">General education, not financial advice.</div>';
+const TS=[
+['.stats','Your scoreboard','Total value is cash plus holdings. Profit/loss compares it with your starting ◎10,000. Dividends received is cash paid out by companies you own.'],
+['#list','Market list','Twelve fictional assets: companies, funds, bonds, property and savings. Click one to chart it. The % is the change since the simulation began, and some are far more volatile than others.'],
+['#cv','Live chart','Prices update every simulated minute. The dashed line marks your average cost once you own the asset. Hover or drag across the chart to read any past price.'],
+['#mode','Asset vs portfolio','Switch to My portfolio to watch your total value against the dashed ◎10,000 starting line.'],
+['#speed','Speed control','Slow, speed up, or pause the market to think before you trade.'],
+['.trade','Trade panel','Enter a quantity (or use 25%, 50%, Max), check the order total including the 0.1% fee, then press Buy or Sell. Switch to Limit or Stop to name your own price and let the order wait.'],
+['#news','News and shocks','Headlines can jolt a price suddenly. Real markets do this too, and you cannot predict it.'],
+['#tbl','Holdings and history','Holdings show unrealised profit/loss per asset. The history tab lists every trade with fees and realised profit/loss.'],
+['#brk','Breaking news','This strip cycles between real headlines (a dated snapshot, not live) and simulated events. Press the button to see how that kind of event would hit these fictional companies.'],['#biz','Business Empire','A small tycoon game. Buy businesses with your tokens, collect the salary they pay, and move it into your investing cash.'],['#lab','Strategy lab','Eight ways to invest and the costs that come with them, from buy and hold to auto-investing on news. Each has a live tool, and the bar compares you with a buy-and-hold index.'],['#events','World events','Real-world events such as interest rate changes, oil shocks or health scares move whole sectors. Guess the winners and losers, then trigger one to compare.'],['#learn','Learn the basics','Twelve short lessons on risk, order types, diversification, costs, strategies and mistakes, plus a three-week practice plan.']];
+let ti=-1;
+function tshow(i){document.querySelectorAll('.tg').forEach(e=>e.classList.remove('tg'));
+ if(i<0||i>=TS.length){stopTalk();$('tour').hidden=true;ti=-1;try{localStorage.setItem('pt-toured','1')}catch(e){}return}
+ ti=i;snd(i==TS.length-1?'win':'tick');const s=TS[i],el=document.querySelector(s[0]);el.classList.add('tg');talk(s[1]+'. '+s[2],1);el.scrollIntoView({block:'center',behavior:'smooth'});
+ $('tb').innerHTML=`<b>${s[1]}</b> <span class="sub">(${i+1}/${TS.length})</span><p>${s[2]}</p><div class="top"><button class="ghost" data-k="x">Skip</button><span style="flex:1"></span>${i?'<button class="ghost" data-k="b">Back</button>':''}<button class="ghost" data-k="n" style="background:var(--ac);color:var(--acx)">${i==TS.length-1?'Finish':'Next'}</button></div>`;
+ $('tour').hidden=false;setTimeout(()=>{const r=el.getBoundingClientRect();$('tb').className=r.top>innerHeight/2?'t':''},400)}
+$('tb').onclick=e=>{const k=e.target.dataset.k;if(k=='n')tshow(ti+1);if(k=='b')tshow(ti-1);if(k=='x')tshow(-1)};
+let SND=true,PSND=true,AC;try{SND=localStorage.getItem('pt-snd')!='0';PSND=localStorage.getItem('pt-ps')!='0'}catch(e){}
+function tone(fr,t0,d,type,v){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t0;o.type=type||'sine';o.frequency.value=fr;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(v||.12,n+.01);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+d+.02)}catch(e){}}
+function snd(k){if(!SND)return;const m={buy:()=>{tone(520,0,.1);tone(660,.07,.1);tone(880,.14,.2)},sell:()=>{tone(880,0,.1);tone(660,.07,.1);tone(440,.14,.2)},div:()=>[1320,1760,2093,2637].forEach((q,i)=>tone(q,i*.07,.25,'triangle',.09)),sellwin:()=>[660,880,1100,1320].forEach((q,i)=>tone(q,i*.06,.18,'triangle',.09)),sellloss:()=>{tone(440,0,.14,'sine',.1);tone(330,.1,.25,'sine',.1)},news:()=>tone(660,0,.15,'sine',.07),err:()=>tone(160,0,.22,'square',.07),tick:()=>tone(900,0,.05,'sine',.06),up:()=>{tone(600,0,.06,'sine',.04);tone(800,.05,.08,'sine',.04)},down:()=>{tone(500,0,.06,'sine',.04);tone(350,.05,.1,'sine',.04)},tab:()=>{tone(1000,0,.04,'triangle',.05);tone(1400,.035,.05,'triangle',.05)},sel:()=>tone(700,0,.05,'sine',.05),open:()=>{tone(500,0,.06,'sine',.06);tone(750,.05,.09,'sine',.06)},win:()=>[523,659,784,1047].forEach((q,i)=>tone(q,i*.09,.2,'triangle',.1))};if(m[k])m[k]()}
+function sndLabel(){$('sndbtn').textContent='Sound: '+(SND?'on':'off');$('sndbtn').setAttribute('aria-pressed',SND)}
+$('sndbtn').onclick=()=>{SND=!SND;try{localStorage.setItem('pt-snd',SND?'1':'0')}catch(e){}sndLabel();snd('tick')};sndLabel();
+function psLabel(){$('psbtn').textContent='Price sounds: '+(PSND?'on':'off');$('psbtn').setAttribute('aria-pressed',PSND)}
+$('psbtn').onclick=()=>{PSND=!PSND;try{localStorage.setItem('pt-ps',PSND?'1':'0')}catch(e){}psLabel();snd(PSND?'up':'tick')};psLabel();
+$('lc').addEventListener('toggle',e=>{if(e.target.open){snd('open');talk(e.target.textContent,1)}else stopTalk()},true);
+let NARR=false,lastTalkMove=0,voiceOK=null;const TTS='speechSynthesis' in window;
+function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>{e.style.display='none'},9000)}
+const EV=[
+{h:'Central bank raises interest rates',x:'Borrowing gets more expensive and future profits are worth less today, so growth companies and biotech fall. Banks earn more on loans, so they rise.',e:{FIRM:2.5,NOVA:-3.5,BOLT:-3,BIOZ:-4.5,ORBT:-1.5,MEDX:-1,HARV:-.5,GRID:-.5}},
+{h:'Central bank cuts interest rates',x:'Cheaper borrowing lifts growth and big spending, while bank margins shrink.',e:{FIRM:-2,NOVA:3.5,BOLT:3.5,BIOZ:4.5,ORBT:2,MEDX:1,HARV:.5,GRID:.5}},
+{h:'Oil supply disruption pushes energy prices up',x:'Energy producers earn more per unit. Fuel-hungry industries face higher costs.',e:{GRID:6,BOLT:-2.5,ORBT:-3,HARV:-1.5,NOVA:-1,FIRM:-.5,BIOZ:-.5}},
+{h:'Inflation comes in hotter than expected',x:'Rising prices raise fears of higher interest rates. Most stocks fall, while essentials and energy hold up better.',e:{NOVA:-3,BOLT:-3,BIOZ:-3.5,ORBT:-2,FIRM:-1,MEDX:-1,HARV:.5,GRID:1.5}},
+{h:'Global health scare spreads',x:'Healthcare demand and research spending jump. Travel, spending and aircraft demand drop.',e:{MEDX:4,BIOZ:7,ORBT:-6,BOLT:-3,FIRM:-2,NOVA:-1,HARV:1,GRID:-2}},
+{h:'Geopolitical tensions escalate',x:'Governments raise defence spending and energy supplies look at risk. Uncertainty hurts everything else.',e:{ORBT:6,GRID:4,NOVA:-2,BOLT:-2,FIRM:-2,BIOZ:-1.5}},
+{h:'Major computing breakthrough announced',x:'Faster, cheaper computing boosts technology firms and spreads to anything that uses software.',e:{NOVA:7,BOLT:2,BIOZ:1.5,ORBT:1,FIRM:.5,MEDX:.5}},
+{h:'Banking sector stress emerges',x:'Fears about loan losses hit banks hardest and raise worry across the whole market.',e:{FIRM:-8,NOVA:-2.5,BOLT:-2.5,BIOZ:-3,ORBT:-2,MEDX:-.5,GRID:-1}},
+{h:'Strong jobs report shows the economy booming',x:'More people earning means more spending and borrowing, so companies tied to the economy gain.',e:{BOLT:3,FIRM:2,NOVA:2,ORBT:2.5,BIOZ:1,MEDX:.5,HARV:.5,GRID:1}},
+{h:'Recession fears grow',x:'Investors move toward essential businesses and away from companies that depend on strong spending.',e:{BOLT:-5,NOVA:-4,ORBT:-4,FIRM:-4,BIOZ:-3,GRID:-1.5,MEDX:1,HARV:1.5}},
+{h:'Regulators fast-track new medical treatments',x:'Faster approvals shorten the wait for new products and boost drug and biotech firms.',e:{BIOZ:8,MEDX:3,NOVA:.5}},
+{h:'Drought drives food prices higher',x:'Crop shortages raise ingredient costs and squeeze food makers.',e:{HARV:-4,GRID:.5,BOLT:-.5,NOVA:-.5,FIRM:-.5}},
+{h:'Technology revenue worries hit chip and software stocks',x:'Doubts that heavy tech spending will pay off pull technology shares down, while steadier sectors hold up better.',e:{NOVA:-5,BOLT:-1,BIOZ:-1.5,FIRM:-.5,MEDX:1,HARV:.7}},
+{h:'Oil supply eases as emergency stocks are released',x:'More supply and calmer fears pull oil prices down, which hurts energy producers and helps fuel-hungry industries.',e:{GRID:-5,BOLT:2,ORBT:2.5,HARV:1,NOVA:1,FIRM:.5}}];
+[[0,{GOLD:-1.5,GILT:-2.5,RENT:-3}],[1,{GOLD:1.5,GILT:2.5,RENT:3}],[2,{GOLD:1.5,GILT:-.5,RENT:-.5}],[3,{GOLD:2,GILT:-2,RENT:-1}],[4,{GOLD:1,GILT:1,RENT:-2}],[5,{GOLD:4,GILT:1.5,RENT:-1}],[7,{GOLD:2,GILT:1.5,RENT:-2}],[8,{GOLD:-.5,GILT:-1,RENT:1.5}],[9,{GOLD:2.5,GILT:3,RENT:-3}],[12,{GOLD:1,GILT:1}],[13,{GOLD:-1,GILT:.5,RENT:.5}]].forEach(([i,e])=>Object.assign(EV[i].e,e));
+function fixS(o){const n=o.px[D[0].s].length;D.forEach(d=>{if(o.px[d.s])return;let a=[d.p];for(let i=1;i<n;i++)a.unshift(a[0]/(1+d.v*randn()));o.px[d.s]=a;o.open[d.s]=a[0];if(o.p0)o.p0[d.s]=d.p});return o}
+function buyIncome(pct){if(follower)takeOver();const L=['SAVE','GILT','RENT','FIRM','GRID','HARV'];let spent=0,n=0;const per=S.cash*pct/L.length;
+ L.forEach(s=>{const p=xp(s,true),q=Math.min(Math.floor(per/(p*(1+FEE))),maxq(s,true));if(q<1)return;const v=p*q,fee=v*FEE,o=S.pos[s]||{q:0,c:0,t0:S.t};o.c=(o.c*o.q+v)/(o.q+q);o.q+=q;S.pos[s]=o;S.cash-=v+fee;spent+=v+fee;n++;S.tx.unshift({t:S.t,b:1,s,q,p,f:fee,tot:v+fee,r:0})});
+ if(!n)return say('Not enough cash to build an income portfolio.');
+ S.pf[S.pf.length-1]=total();labDirty=true;lastPush=0;save();render();snd('buy');say(`Bought ${n} income assets for ${T(spent)}.`,1);
+ talk(`You spread ${f(spent)} tokens across ${n} income assets: savings, bonds, property and dividend shares. They pay you interest, rent and dividends every quarter, so you earn even when prices go nowhere.`,1)}
+function renderEvents(){const el=$('evs');if(!el)return;el.innerHTML=(S.evs&&S.evs.length)?S.evs.map(v=>`<div style="border-color:var(--ac)"><b>${v.h}</b> <span class="sub">tick ${v.t}</span><br><span class="sub">${v.x}</span><br>`+Object.keys(v.e).filter(k=>Math.abs(v.e[k])>=.3).sort((a,b)=>Math.abs(v.e[b])-Math.abs(v.e[a])).map(k=>`<span class="${v.e[k]>=0?'up':'dn'}">${k} ${pc(v.e[k])}</span>`).join(' &nbsp; ')+'</div>').join(''):'<div class="sub">No world events yet. They happen at random, or trigger one above.</div>'}
+function fireEvent(i){if(i==null)i=Math.floor(Math.random()*EV.length);const ev=EV[i],e={};
+ D.forEach(d=>{const a=S.px[d.s],pct=(ev.e[d.s]||0)*(.7+Math.random()*.6);e[d.s]=pct;a[a.length-1]=Math.max(1,a[a.length-1]*(1+pct*.6/100));if(pct)(S.pend=S.pend||[]).push({s:d.s,p:pct*.4/8,n:8})});
+ S.evs=[{t:S.t,h:ev.h,x:ev.x,e}].concat(S.evs||[]).slice(0,5);snd('news');bizEvent(i);const botMsg=autoTrade(ev,e)||'';S.pf[S.pf.length-1]=total();renderEvents();render();
+ const mv=Object.keys(e).sort((a,b)=>Math.abs(e[b])-Math.abs(e[a])).slice(0,2).map(k=>`${k} ${e[k]>=0?'up':'down'} ${f(Math.abs(e[k]),1)} percent`).join(' and ');
+ talk(`Breaking world event: ${ev.h}. ${ev.x} The biggest moves: ${mv}. ${botMsg}`,1);bShow(2*i+1,1);hold=Date.now()+12000}
+$('evsel').innerHTML=EV.map((v,i)=>`<option value="${i}">${v.h}</option>`).join('');
+$('evgo').onclick=()=>{if(follower)takeOver();fireEvent(+$('evsel').value);lastPush=0;save()};
+const RN=[
+{d:'12 Oct 2026',s:'Reuters, via Virginia Business',h:'Brent crude climbs to around $106 a barrel as attacks on Saudi Arabia and on tankers deepen supply fears',i:2},
+{d:'8 Oct 2026',s:'Stockpil market report',h:'An oil surge reignites inflation worries and pushes government bond yields higher while stocks fall',i:3},
+{d:'10-12 Oct 2026',s:'Nation Thailand',h:'A missile attack on Riyadh airport and more strikes on Saudi Arabia raise fears of a wider Middle East conflict',i:5},
+{d:'5 Oct 2026',s:'Engine, citing ING analysts',h:'G7 countries agree to release up to 100 million barrels of emergency oil stocks over four months',i:13},
+{d:'12 Oct 2026',s:'Reuters, via Virginia Business',h:'Russia and Ukraine announce an energy-infrastructure ceasefire, and extra Russian diesel exports are touted',i:13},
+{d:'8-12 Oct 2026',s:'Market news roundups',h:'The Nasdaq slips on worries about AI revenues as chip and networking stocks weaken, while defensive sectors hold up better',i:12}];
+let bk=0,bpause=false,bcur=0,hold=0;
+function bShow(k,brk){bk=k;const real=k%2==0,o=real?RN[(k/2)%RN.length]:null,i=real?o.i:((k-1)/2)%EV.length,ev=EV[i];bcur=i;
+ const chips=Object.keys(ev.e).sort((a,b)=>Math.abs(ev.e[b])-Math.abs(ev.e[a])).slice(0,4).map(s=>`<span class="${ev.e[s]>=0?'up':'dn'}">${s} ${ev.e[s]>=0?'▲':'▼'}</span>`).join(' &nbsp; ');
+ $('bt').textContent=brk?'BREAKING · SIMULATED':real?'REAL NEWS':'SIMULATED EVENT';
+ $('bh').textContent=real?o.h:ev.h;$('bx').textContent=real?`${o.s}, ${o.d}. Real headline, paraphrased. A snapshot, not live.`:ev.x;
+ $('bc').innerHTML=(real?'In this simulator, that kind of event would hit: ':'Likely winners and losers: ')+chips;$('bgo').textContent=real?'See it happen here':'Trigger it'}
+setInterval(()=>{if(!bpause&&Date.now()>hold)bShow(bk+1)},7000);
+$('bp').onclick=()=>bShow(Math.max(0,bk-1));$('bn').onclick=()=>bShow(bk+1);
+$('bpa').onclick=()=>{bpause=!bpause;$('bpa').textContent=bpause?'Resume':'Pause'};
+$('bgo').onclick=()=>{if(follower)takeOver();fireEvent(bcur);lastPush=0;save()};
+bShow(0);
+function bench(){const p0=S.p0||S.open;return D.reduce((a,d)=>a+P(d.s)/p0[d.s],0)/D.length}
+function idxS(){const p0=S.p0||S.open,n=S.px[D[0].s].length;return Array.from({length:n},(_,i)=>100*D.reduce((a,d)=>a+S.px[d.s][i]/p0[d.s],0)/D.length)}
+function sma(a,n){return a.map((_,i)=>i<n-1?null:a.slice(i-n+1,i+1).reduce((s,v)=>s+v,0)/n)}
+function rsi(a){const s=a.slice(-15);let g=0,l=0;for(let i=1;i<s.length;i++){const d=s[i]-s[i-1];if(d>0)g+=d;else l-=d}return l==0?100:100-100/(1+g/l)}
+function buyIndex(pct){if(follower)takeOver();let spent=0,n=0;const per=S.cash*pct/D.length;
+ D.forEach(d=>{const p=xp(d.s,true),q=Math.min(Math.floor(per/(p*(1+FEE))),maxq(d.s,true));if(q<1)return;const v=p*q,fee=v*FEE,o=S.pos[d.s]||{q:0,c:0,t0:S.t};o.c=(o.c*o.q+v)/(o.q+q);o.q+=q;S.pos[d.s]=o;S.cash-=v+fee;spent+=v+fee;n++;S.tx.unshift({t:S.t,b:1,s:d.s,q,p,f:fee,tot:v+fee,r:0})});
+ if(!n)return say('Not enough cash to buy even one share of each asset.');
+ S.pf[S.pf.length-1]=total();labDirty=true;lastPush=0;save();render();snd('buy');say(`Bought ${n} assets for ${T(spent)} to mirror the index.`,1);
+ talk(`You spread ${f(spent)} tokens across ${n} assets, one position in each. That is index investing: instead of picking winners you own a little of everything, so no single company can sink you.`,1)}
+function renderLab(){autoLabel();const t=slTab,sbv=(total()-START-(S.dep||0))/(START+(S.dep||0))*100,bv=(bench()-1)*100,fees=S.tx.reduce((a,x)=>a+(x.b==2?0:x.f),0);
+ $('sb').innerHTML=`Your return <b class='${sbv>=0?'up':'dn'}'>${pc(sbv)}</b> &nbsp;|&nbsp; Buy-and-hold index (equal weight, from the start) <b class='${bv>=0?'up':'dn'}'>${pc(bv)}</b> &nbsp;|&nbsp; Fees paid <b>${T(fees)}</b>`;let h='';
+ if(t=='bh'){const ks=Object.keys(S.pos);h=`<p>Buy sound assets and keep them for a long time, ignoring daily noise. You pay fewer fees, avoid panic decisions, and give growth and dividends time to work.</p><p>Ticks since your last transaction: <b>${S.tx.length?S.t-S.tx[0].t:S.t}</b>.</p>`+(ks.length?'<ul>'+ks.map(s=>{const o=S.pos[s];return `<li><b>${s}</b> held ${S.t-(o.t0??S.t)} ticks, ${pc((P(s)/o.c-1)*100)} vs your cost</li>`}).join('')+'</ul>':'<p class="sub">Buy something, then try leaving it alone for a while.</p>')}
+ else if(t=='ix'){h=`<p>Index investing means owning a slice of everything instead of picking winners. Here the index is all twelve assets in equal weights, so one bad company cannot sink you.</p><p>Index level: <b>${f(idxS().slice(-1)[0],1)}</b> (100 at the start).</p><p><button class='ghost' data-a='ix25'>Invest 25% of cash</button> <button class='ghost' data-a='ix50'>Invest 50%</button> <button class='ghost' data-a='ix100'>Invest all cash</button> <button class='ghost' data-a='ixc'>Show index chart</button></p><p class='sub'>It buys whole shares of each asset, so a little cash may be left over.</p>`}
+ else if(t=='fa'){h=`<p>Fundamental analysis asks what a business is worth, using its profits, growth, debt and dividends, then compares that with its price. P/E is price divided by earnings per share. PEG divides P/E by growth, so a high P/E can still be fair if growth is strong.</p><div class='tw'><table><tr><th>Asset</th><th>Price</th><th>Earnings/share</th><th>P/E</th><th>Growth %</th><th>PEG</th><th>Debt</th><th>Yield %</th><th>Reading</th></tr>`+D.filter(d=>FUND[d.s].eps).map(d=>{const u=FUND[d.s],p=P(d.s),pe=p/u.eps,pg=pe/u.g;return `<tr style='cursor:pointer' data-s='${d.s}'><td><b>${d.s}</b></td><td>${f(p)}</td><td>${f(u.eps)}</td><td>${f(pe,1)}</td><td>${u.g}</td><td>${f(pg,1)}</td><td>${u.de}</td><td>${f(d.y*400,1)}</td><td>${pg<2?'Cheap for its growth':pg<3.5?'Fairly priced':'Expensive for its growth'}</td></tr>`}).join('')+`</table></div><p class='sub'>These figures are made up. Here prices move at random and with events, not with earnings, so fundamentals will not predict your results in the simulator. In real markets they are how investors judge value.</p>`}
+ else if(t=='ta'){const a=S.px[sel],s20=sma(a,20).pop(),s50=sma(a,50).pop(),r=rsi(a);h=`<p>Technical analysis studies past prices for patterns. A moving average is the average price over recent updates, and RSI measures momentum from 0 to 100.</p><ul><li><b>${sel}</b> 20-tick average ${f(s20)} vs 50-tick average ${f(s50)}: ${s20>s50?'the short-term trend is above the long-term trend (a bullish signal)':'the short-term trend is below the long-term trend (a bearish signal)'}.</li><li>RSI ${f(r,0)}: ${r>70?'overbought, so some traders expect a pullback':r<30?'oversold, so some traders expect a bounce':'neutral'}.</li></ul><p><button class='ghost' data-a='ta'>${TA?'Hide':'Show'} averages on the chart</button></p><p class='sub'>Prices here move at random, so these signals have no real predictive power. Try following them and compare with buy and hold. Evidence for technical analysis in real markets is weak.</p>`}
+ else if(t=='au'){const B=S.bot||{on:false,pct:25,log:[]};h=`<p>Auto-invest reads each world-news event and trades for you. After a headline it buys the two assets expected to gain most and sells any holdings of the two expected to fall most, ignoring tiny moves.</p><p><button class='ghost' data-a='autoon'>Auto-invest: ${B.on?'on (tap to turn off)':'off (tap to turn on)'}</button></p><p>Cash to use per event: <button class='ghost' data-a='ap10'>${B.pct==10?'\u2713 ':''}10%</button> <button class='ghost' data-a='ap25'>${B.pct==25?'\u2713 ':''}25%</button> <button class='ghost' data-a='ap50'>${B.pct==50?'\u2713 ':''}50%</button></p>`+(B.log&&B.log.length?'<ul>'+B.log.map(l=>`<li><b>${l.h}</b> (tick ${l.t}): ${l.m}</li>`).join('')+'</ul>':'<p class="sub">No automatic trades yet. Events happen at random, or press Trigger event in the World events panel.</p>')+`<p class='sub'>Lesson: the bot acts only after the headline has moved prices, so it catches just the part of the move that is left (here, about 40%). In real markets most of a move happens within seconds, which is why automated traders race to react first. Each trade also pays the 0.1% fee, and the follow-through here is my own simplification.</p>`}
+ else if(t=='in'){let inc=0;const hs=D.filter(d=>d.y&&S.pos[d.s]).map(d=>{const y=S.pos[d.s].q*P(d.s)*d.y*4;inc+=y;return `<li><b>${d.s}</b>: about ${T(y)} a year</li>`}).join('');
+ h=`<p>Some assets pay you regularly, so you can earn even when the price goes nowhere. Savings and bonds pay interest, property trusts pay rent, and some companies pay dividends. Gold pays nothing, but it can hold its value when other assets fall. Income arrives every 90 ticks, and 10% is withheld as tax.</p><div class='tw'><table><tr><th>Asset</th><th>Type</th><th>Income % a year</th><th>Price risk</th></tr>`+D.slice().sort((a,b)=>b.y-a.y).map(d=>`<tr data-s='${d.s}' style='cursor:pointer'><td><b>${d.s}</b></td><td>${SEC[d.s]}</td><td>${d.y?f(d.y*400,1):'None'}</td><td>${d.v<.003?'Low':d.v<.0055?'Medium':'High'}</td></tr>`).join('')+`</table></div><p>Your holdings would pay about <b>${T(inc)}</b> a year at today's prices, before tax.</p>${hs?'<ul>'+hs+'</ul>':''}<p><button class='ghost' data-a='inc25'>Build an income portfolio with 25% of cash</button> <button class='ghost' data-a='inc50'>with 50%</button></p><p class='sub'>The income portfolio splits cash equally across SAVE, GILT, RENT, FIRM, GRID and HARV. A higher yield can mean higher risk, and bond and property prices fall when interest rates rise. Nothing here is guaranteed.</p>`}
+ else if(t=='rw'){const tx=S.tax||{paid:0,credit:0},on=k=>RL(k)?'on':'off';h=`<p>Real markets charge you for more than a flat fee. These three costs are on by default, and you can switch each one off to see how much it matters.</p><p><button class='ghost' data-a='rlsp'>Spreads: ${on('sp')}</button> <button class='ghost' data-a='rltx'>Taxes: ${on('tx')}</button> <button class='ghost' data-a='rllq'>Thin markets: ${on('lq')}</button></p><ul><li><b>Spreads:</b> you buy at the higher ask price and sell at the lower bid price, so a quick round trip loses the gap. Rarely traded assets have wider spreads.</li><li><b>Taxes:</b> 20% of realised profit is taken when you sell, losses carry forward to reduce later tax, and 10% of dividends is withheld. Tax paid so far: <b>${T(tx.paid)}</b>. Loss credit saved: <b>${T(tx.credit)}</b>.</li><li><b>Thin markets:</b> only so much can be bought or sold at the quoted price in one order. Bigger orders fill partly and you finish over the next ticks, which is how big positions get stuck in real markets.</li></ul><div class='tw'><table><tr><th>Asset</th><th>Bid</th><th>Ask</th><th>Spread %</th><th>Max per order</th></tr>`+D.map(d=>`<tr data-s='${d.s}' style='cursor:pointer'><td><b>${d.s}</b></td><td>${f(xp(d.s,false))}</td><td>${f(xp(d.s,true))}</td><td>${RL('sp')?f(SPR[d.s],2):'0.00'}</td><td>${RL('lq')?maxq(d.s,true)+' shares':'No limit'}</td></tr>`).join('')+`</table></div><p class='sub'>Simplified for learning. The rates are generic and ignore allowances and tax-free accounts, which differ by country, and real sales can also take days to settle.</p>`}
+ else{const tr=S.tx.filter(x=>x.b!=2&&x.b!=3),se=S.tx.filter(x=>x.b==0),w=se.filter(x=>x.r>0).length;h=`<p>Day trading means buying and selling within short windows to profit from small moves. Each trade pays a fee and short-term moves are mostly random, so fees alone make it hard to come out ahead. Most real day traders lose money.</p><ul><li>Trades made: <b>${tr.length}</b></li><li>Sells at a profit: <b>${se.length?w+' of '+se.length+' ('+f(w/se.length*100,0)+'%)':'none yet'}</b></li><li>Fees paid: <b>${T(fees)}</b>, ${f(fees/START*100,2)}% of your starting tokens</li><li>Your return ${pc(sbv)} vs the buy-and-hold index ${pc(bv)}</li></ul><p class='sub'>Try a session of rapid trading, then compare with simply holding. Real day trading also faces spreads, delays and stress that this simulator does not.</p>`}
+ $('sl').innerHTML=h}
+$('sl').onclick=e=>{const a=e.target.dataset.a;if(!a)return;if(a=='ta'){TA=!TA;snd('tab');labDirty=true;render()}else if(a=='ixc'){document.querySelector('#mode [data-m=ix]').click()}else if(a=='autoon')autoSet(!(S.bot&&S.bot.on));else if(a.startsWith('inc'))buyIncome(+a.slice(3)/100);else if(a=='rlsp'||a=='rltx'||a=='rllq'){const k=a.slice(2);S.rl=S.rl||{};S.rl[k]=RL(k)?0:1;snd('tab');labDirty=true;lastPush=0;save();render()}else if(a.startsWith('ap')){S.bot=S.bot||{on:false,pct:25,log:[]};S.bot.pct=+a.slice(2);labDirty=true;save();render()}else buyIndex(+a.slice(2)/100)};
+$('sltabs').onclick=e=>{const t=e.target.dataset.l;if(!t)return;snd('tab');slTab=t;document.querySelectorAll('#sltabs button').forEach(b=>b.classList.toggle('on',b.dataset.l==t));renderLab();const p=$('sl').querySelector('p');if(p)talk(p.textContent,1)};
+function autoLabel(){const on=!!(S.bot&&S.bot.on),b=$('autobtn');if(b){b.textContent='Auto-invest: '+(on?'on':'off');b.setAttribute('aria-pressed',on)}}
+function autoTrade(ev,e){const B=S.bot;if(!B||!B.on)return '';
+ const ks=Object.keys(e).filter(k=>Math.abs(e[k])>=1.5).sort((a,b)=>e[b]-e[a]),ups=ks.filter(k=>e[k]>0).slice(0,2),dns=ks.filter(k=>e[k]<0).slice(-2),sold=[],bought=[];
+ dns.forEach(s=>{const o=S.pos[s];if(!o)return;const q=Math.min(o.q,maxq(s,false)),p=xp(s,false),v=p*q,fee=v*FEE,r0=(p-o.c)*q-fee,tax=taxOn(r0),r=r0-tax;S.cash+=v-fee-tax;S.tx.unshift({t:S.t,b:0,s,q,p,f:fee,tot:v-fee-tax,r,tx:tax,a:1});sold.push(`${s} (${q} shares)`);o.q-=q;if(!o.q)delete S.pos[s]});
+ const per=S.cash*B.pct/100/Math.max(1,ups.length);
+ ups.forEach(s=>{const p=xp(s,true),q=Math.min(Math.floor(per/(p*(1+FEE))),maxq(s,true));if(q<1)return;const v=p*q,fee=v*FEE,o=S.pos[s]||{q:0,c:0,t0:S.t};o.c=(o.c*o.q+v)/(o.q+q);o.q+=q;S.pos[s]=o;S.cash-=v+fee;S.tx.unshift({t:S.t,b:1,s,q,p,f:fee,tot:v+fee,r:0,a:1});bought.push(`${s} (${q} shares)`)});
+ const m=`Auto-invest: ${bought.length?'bought '+bought.join(', '):'bought nothing'}${sold.length?'; sold '+sold.join(', '):''}.`;
+ B.log=[{t:S.t,h:ev.h,m}].concat(B.log||[]).slice(0,6);labDirty=true;snd(bought.length?'buy':'sell');return m}
+function autoSet(on){if(follower)takeOver();S.bot=S.bot||{on:false,pct:25,log:[]};S.bot.on=on;autoLabel();labDirty=true;lastPush=0;save();render();talk(on?'Auto-invest is on. After each world event I will buy the likely winners and sell the likely losers.':'Auto-invest is off.',1)}
+$('autobtn').onclick=()=>autoSet(!(S.bot&&S.bot.on));
+function RL(k){return !S.rl||S.rl[k]!==0}
+function xp(s,buy){const m=P(s);return RL('sp')?m*(1+(buy?1:-1)*SPR[s]/200):m}
+function maxq(s,buy){return RL('lq')?Math.max(1,Math.floor(DEP[s]/xp(s,buy))):1e9}
+function taxPeek(r){if(!RL('tx')||r<=0)return 0;const c=(S.tax&&S.tax.credit)||0;return Math.max(0,r-c)*TAXR}
+function taxOn(r){if(!RL('tx'))return 0;S.tax=S.tax||{paid:0,credit:0};if(r<=0){S.tax.credit-=r;return 0}const u=Math.min(S.tax.credit,r);S.tax.credit-=u;const t=(r-u)*TAXR;S.tax.paid+=t;return t}
+function stopTalk(){if(TTS)speechSynthesis.cancel()}
+function talk(t,now,force){if((!NARR&&!force)||!TTS)return;t=String(t).replace(/◎/g,'').replace(/%/g,' percent').replace(/\s+/g,' ');const parts=t.match(/.*?[.!?](?=\s|$)|.+$/g)||[t];const go=()=>{try{speechSynthesis.resume()}catch(e){}const v=speechSynthesis.getVoices().find(x=>/^en/i.test(x.lang));parts.forEach((p,i)=>{const u=new SpeechSynthesisUtterance(p.trim());u.lang=v?v.lang:'en-US';if(v)u.voice=v;if(!i)u.onstart=()=>{voiceOK=true;nLabel()};u.onerror=e=>{if(e.error!='interrupted'&&e.error!='canceled'){voiceOK=false;nLabel()}};speechSynthesis.speak(u)})};if(now&&(speechSynthesis.speaking||speechSynthesis.pending)){speechSynthesis.cancel();setTimeout(go,80)}else{if(!now&&speechSynthesis.pending)return;go()}}
+function nLabel(){$('nbtn').textContent=!TTS?'Narration: unavailable':NARR?(voiceOK===false?'Narration: no sound':'Narration: on'):'Narration: off';$('nbtn').setAttribute('aria-pressed',NARR)}
+$('nbtn').onclick=()=>{if(!TTS){toast('Spoken narration is not available in this browser. Try Safari or Chrome.');return}NARR=!NARR;voiceOK=null;nLabel();if(NARR){talk('Narration is on. I will explain trades, dividends, news and big price moves as they happen.',1);setTimeout(()=>{if(NARR&&voiceOK!==true){voiceOK=false;nLabel();toast('No voice played. If you are in the Claude app, open this link in Safari or Chrome instead. Also check that your phone is not on silent and the volume is up.')}},2500)}else stopTalk()};nLabel();
+function describeAsset(s){const d=D.find(x=>x.s==s),p=P(s),c=(p/S.open[s]-1)*100,own=(S.pos[s]||{q:0}).q,vl=d.v>.008?'very high':d.v>.0045?'high':d.v>.003?'medium':'low';
+ return `${d.n}, in ${SEC[s]}, ticker ${s}. The price is ${f(p)} tokens, ${c>=0?'up':'down'} ${f(Math.abs(c),1)} percent since the simulation began. Volatility is ${vl}, so ${vl=='low'?'price swings are usually small':'the price can swing a lot in both directions'}. ${d.y?'It pays a dividend, yielding about '+f(d.y*400,1)+' percent a year.':'It pays no dividend.'} ${own?'You own '+own+' shares.':'You do not own any.'}`}
+function explainNow(){const t=total(),pl=t-START-(S.dep||0),ks=Object.keys(S.pos),a=D.map(d=>({s:d.s,c:(P(d.s)/S.open[d.s]-1)*100})).sort((x,y)=>y.c-x.c);
+ let m=`Your portfolio is worth ${f(t)} tokens: ${f(S.cash)} in cash and ${f(hv())} in holdings. Compared with the ${f(START+(S.dep||0),0)} tokens you have put in, you are ${pl>=0?'up':'down'} ${f(Math.abs(pl))} tokens, or ${f(Math.abs(pl/(START+(S.dep||0))*100),1)} percent. `;
+ if(ks.length){const g=ks.map(s=>[s,(P(s)-S.pos[s].c)*S.pos[s].q]).sort((x,y)=>y[1]-x[1]);m+=`You hold ${ks.join(', ')}. Your best position is ${g[0][0]} at ${g[0][1]>=0?'a gain':'a loss'} of ${f(Math.abs(g[0][1]))} tokens`+(g.length>1?`, and your weakest is ${g[g.length-1][0]} at ${g[g.length-1][1]>=0?'a gain':'a loss'} of ${f(Math.abs(g[g.length-1][1]))} tokens. `:'. ')}else m+='You do not own anything yet, so your value only changes when you buy. ';
+ m+=`In the market, ${a[0].s} is the strongest at ${a[0].c>=0?'up':'down'} ${f(Math.abs(a[0].c),1)} percent and ${a[a.length-1].s} the weakest at ${a[a.length-1].c>=0?'up':'down'} ${f(Math.abs(a[a.length-1].c),1)} percent. Prices move at random here, with some assets more volatile than others, and this is practice with no real money. Now the selected asset. `+describeAsset(sel);return m}
+$('exbtn').onclick=()=>{if(!TTS){toast('Spoken narration is not available in this browser. Try Safari or Chrome.');return}voiceOK=null;talk(explainNow(),1,1);setTimeout(()=>{if(voiceOK!==true)toast('No voice played. If you are in the Claude app, open this link in Safari or Chrome instead. Also check that your phone is not on silent and the volume is up.')},2500)};
+const DEV=Math.random().toString(36).slice(2,8);let dref=null,lastRemote=0,lastPush=0,pushT=0,busy=false;
+function badge(){const b=$('sync');b.textContent=!dref?'Sync: this device only':follower?'Following your other device · tap to take over':'Synced across your devices';b.className='badge'+(follower?' follow':'')}
+function follow(on){follower=on;if(on)clearInterval(timer);else setTimer();badge()}
+function takeOver(){if(follower){follow(false);syncPush()}}
+function syncPush(){if(!dref||follower)return;clearTimeout(pushT);const w=Date.now()-lastPush;if(busy||w<6000){pushT=setTimeout(syncPush,Math.max(800,6000-w));return}
+ busy=true;lastPush=Date.now();const st=JSON.parse(JSON.stringify(S));D.forEach(d=>st.px[d.s]=st.px[d.s].slice(-250));st.pf=st.pf.slice(-250);st.tx=st.tx.slice(0,150);st.ts=lastPush;S.ts=lastPush;
+ dref.set({dev:DEV,ts:lastPush,state:st}).catch(()=>{}).finally(()=>{busy=false})}
+function onRemote(d){if(!d||!d.state||d.dev==DEV)return;lastRemote=Date.now();if(d.ts<=(S.ts||0))return;
+ S=fixS(JSON.parse(JSON.stringify(d.state)));S.ts=d.ts;tick=0;follow(Date.now()-d.ts<25000);renderNews();render()}
+setInterval(()=>{if(follower&&document.visibilityState=='visible'&&Date.now()-lastRemote>25000)takeOver()},8000);
+$('sync').onclick=takeOver;badge();
+(async()=>{try{if(!window.claude)return;const[db,u]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!u)return;const id=await u.id();
+ dref=db.doc('data/users/'+id+'/sim');dref.onSnapshot(s=>{try{if(s.exists)onRemote(s.data());else syncPush()}catch(e){}},()=>{dref=null;badge()});badge()}catch(e){}})();
+var bizOK=false;const BCAP=1500;
+const BZ=[['lem','Lemonade Stand',100,.15],['bak','Bakery',650,1],['van','Delivery Vans',3500,5.5],['wks','Workshop',18000,28],['web','Software Studio',90000,140]];
+function bz(){return S.biz||(S.biz={own:{},wal:0,life:0})}
+function bMul(){const B=bz();return (B.mx&&S.t<B.mx?B.mm:1)*(B.ex&&S.t<B.ex?B.em:1)}
+function bRate(){const B=bz();return BZ.reduce((a,b)=>a+(B.own[b[0]]||0)*b[3]*(B.mgr&&B.mgr[b[0]]?2:1),0)*bMul()}
+function bCost(i){const B=bz();return Math.ceil(BZ[i][2]*Math.pow(1.15,B.own[BZ[i][0]]||0))}
+function bizTick(){const B=bz(),r=bRate();B.wal+=r;B.life+=r;if(Object.values(B.own).some(n=>n>0)&&Math.random()<.004)bizRandom()}
+function bizRandom(){const B=bz(),k=Math.floor(Math.random()*4);let m;
+ if(k==0){B.em=1.5;B.ex=S.t+60;m='Viral hit: customers flood in, so income is up 50% for a while.'}
+ else if(k==1){B.em=.6;B.ex=S.t+60;m='Bad review: customers stay away, so income is down 40% for a while.'}
+ else if(k==2){const l=B.wal*.1;B.wal-=l;m=`Equipment breaks and repairs cost ${T(l)} from your salary wallet.`}
+ else{const g=Math.max(5,bRate()*20);B.wal+=g;B.life+=g;m=`A big order comes in and pays a bonus of ${T(g)}.`}
+ B.msg=m;B.mt=S.t;talk('Business news: '+m);snd(k==1||k==2?'err':'div')}
+function bPay(c){const B=bz(),w=Math.min(B.wal,c),cs=c-w;if(cs>S.cash+1e-9){say(`You need ${T(c)}. Your salary wallet and cash together are ${T(B.wal+S.cash)}.`);return false}B.wal-=w;S.cash-=cs;S.dep=(S.dep||0)-cs;return true}
+function bizMgr(i){if(follower)takeOver();const B=bz(),k=BZ[i][0];B.mgr=B.mgr||{};if(B.mgr[k])return;if(!(B.own[k]>0))return say('Buy at least one first, then you can hire a manager.');if(!bPay(BZ[i][2]*8))return;B.mgr[k]=1;S.pf[S.pf.length-1]=total();lastPush=0;save();render();snd('buy');say(`Hired a manager for the ${BZ[i][1]}. It now earns double.`,1);talk('You hired a manager. That business now pays double.',1)}
+function bizEvent(i){const m={9:.6,4:.75,8:1.3,3:.9,13:1.05}[i];if(m){const B=bz();B.mm=m;B.mx=S.t+90}}
+function bizInit(){$('bz').innerHTML=BZ.map((b,i)=>`<div class='card' style='padding:10px'><b>${b[1]}</b> <span class='sub' id='bo${i}'></span><div class='sub'>Pays ${f(b[3],2)} per tick each</div><button class='ghost' id='bb${i}' style='margin-top:8px;width:100%'></button><button class='ghost' id='bm${i}' style='margin-top:6px;width:100%'></button></div>`).join('');BZ.forEach((b,i)=>{$('bb'+i).onclick=()=>bizBuy(i);$('bm'+i).onclick=()=>bizMgr(i)});bizOK=true;bizUpd()}
+function bizUpd(){if(!bizOK)return;const B=bz(),m=bMul();$('bw').textContent=T(B.wal);$('br').textContent='\u25ce'+f(bRate(),2);$('bl').textContent=T(B.life);$('bm').textContent=m<1?'Slump \u00d7'+m:m>1?'Boom \u00d7'+m:'Normal times';
+ BZ.forEach((b,i)=>{const n=B.own[b[0]]||0,c=bCost(i),can=B.wal+S.cash>=c,bt=$('bb'+i);$('bo'+i).textContent='\u00d7'+n;bt.textContent='Buy for '+T(c);bt.disabled=!can;bt.style.opacity=can?1:.5;const mb=$('bm'+i),mc=b[2]*8,hired=B.mgr&&B.mgr[b[0]];mb.textContent=hired?'Manager hired (income x2)':'Hire manager (x2) for '+T(mc);mb.disabled=!!hired||!(n>0)||B.wal+S.cash<mc;mb.style.opacity=mb.disabled?.5:1});const day=Math.floor(S.t/390),used=B.cd===day?B.cm:0;$('bmv').textContent='Move salary to investing ('+T(Math.max(0,BCAP-used))+' left today)';$('bnw').textContent=B.msg&&S.t-B.mt<120?B.msg:''}
+function bizBuy(i){if(follower)takeOver();const B=bz(),c=bCost(i),w=Math.min(B.wal,c),cs=c-w;if(cs>S.cash+1e-9)return say(`You need ${T(c)} to buy that. Your salary wallet and cash together are ${T(B.wal+S.cash)}.`);
+ B.wal-=w;S.cash-=cs;S.dep=(S.dep||0)-cs;B.own[BZ[i][0]]=(B.own[BZ[i][0]]||0)+1;S.pf[S.pf.length-1]=total();lastPush=0;save();render();snd('buy');say(`Bought a ${BZ[i][1]} for ${T(c)}.`,1);talk(`You bought a ${BZ[i][1]}. It adds ${f(BZ[i][3])} tokens of salary every tick.`,1)}
+$('bmv').onclick=()=>{if(follower)takeOver();const B=bz(),day=Math.floor(S.t/390);if(B.cd!==day){B.cd=day;B.cm=0}const room=BCAP-B.cm,a=Math.floor(Math.min(B.wal,room)*100)/100;if(a<1)return say(room<1?`Daily limit reached: you can move up to ${T(BCAP)} of salary per simulated day. It resets tomorrow.`:'Your salary wallet needs at least \u25ce1 to move.');B.cm+=a;B.wal-=a;S.cash+=a;S.dep=(S.dep||0)+a;S.tx.unshift({t:S.t,b:3,s:'Salary',q:'\u2013',p:0,f:0,tot:a,r:0});S.pf[S.pf.length-1]=total();lastPush=0;save();render();snd('div');say(`Moved ${T(a)} of salary into your investing cash.`,1);talk(`You moved ${f(a)} tokens of salary into your investing cash. You can now invest it in the market.`,1)};
+$('bsh').onclick=()=>{if(follower)takeOver();const B=bz(),a=1+bRate()*3;B.wal+=a;B.life+=a;snd('tick');bizUpd()};
+bizInit();
+function scanSim(silent){const tot=total(),B=bz(),good=[],warn=[],add=(a,w,h,x,k,l)=>a.push({w,h,x,k,l});
+ const ks=Object.keys(S.pos),vals=ks.map(s=>[s,S.pos[s].q*P(s)]).sort((a,b)=>b[1]-a[1]),hv=vals.reduce((a,v)=>a+v[1],0),cashP=S.cash/tot*100;
+ const tr=S.tx.filter(x=>x.b<2),rec=tr.filter(x=>S.t-x.t<=200).length,fees=tr.reduce((a,x)=>a+(x.f||0),0),tax=(S.tax&&S.tax.paid)||0,cred=(S.tax&&S.tax.credit)||0;
+ const sells=S.tx.filter(x=>x.b==0),wins=sells.filter(x=>x.r>0).length,dv=s=>D.find(d=>d.s==s),inc=ks.reduce((a,s)=>a+S.pos[s].q*P(s)*dv(s).y*4,0);
+ const dep=S.dep||0,ret=(tot-START-dep)/(START+dep)*100;
+ if(cashP>40)add(warn,3,`${f(cashP,0)}% of your money is sitting in cash`,`Idle cash earns nothing. Even the savings account would pay about ${T(S.cash*.035)} a year on it. Keep a buffer, but put some to work.`,'inc','Invest 25% in income assets');
+ else if(cashP<5&&hv>0)add(warn,2,'You have almost no cash left','Keep a small buffer so you can act when prices drop or events hit.');
+ else add(good,1,'Healthy cash buffer',`${f(cashP,0)}% in cash leaves room to act.`);
+ if(!ks.length)add(warn,3,'You are not invested in anything','All your tokens are cash, so only interest and your businesses can grow it.','inc','Invest 25% in income assets');
+ else{if(ks.length<=3)add(warn,3,`Only ${ks.length} of ${D.length} assets`,'Spreading across more assets lowers the damage if any one of them falls.');
+  const top=vals[0];if(top[1]/tot*100>30)add(warn,3,`${top[0]} is ${f(top[1]/tot*100,0)}% of your total`,'One asset this large can swing your whole result. A common rule of thumb is to keep any single one under about 25%.');
+  const cl=s=>({GILT:'bonds',RENT:'property',GOLD:'gold',SAVE:'savings'})[s]||'shares',have=new Set(ks.map(cl)),miss=['shares','bonds','property','gold','savings'].filter(c=>!have.has(c));
+  if(miss.length>=2)add(warn,2,`You hold no ${miss.join(', ')}`,'Different kinds of assets react differently to events. Bonds and property pay income, and gold tends to hold up in scares.');
+  else if(ks.length>=4)add(good,2,'Spread across asset types','You own several kinds of assets, so one event will not hit everything.');
+  if(inc<tot*.02)add(warn,2,`Your holdings pay only about ${T(inc)} a year`,'Income assets keep paying even when prices stall. See the Income assets tab.','inc','Invest 25% in income assets');
+  else add(good,3,`Your holdings pay about ${T(inc)} a year`,`That is ${f(inc/tot*100,1)}% of your total, before tax.`)}
+ const pen=ks.filter(s=>P(s)<5);if(pen.length)add(warn,2,`${pen.join(', ')} trades at a very low price`,'Prices near the floor swing wildly in percentage terms and can lose most of their value fast. Keep these positions small.');
+ const hvv=vals.filter(v=>dv(v[0]).v>.005).reduce((a,v)=>a+v[1],0);if(hvv/tot>.4)add(warn,2,`${f(hvv/tot*100,0)}% of your total is in very volatile assets`,'BOLT, ORBT and BIOZ move the most. Balance them with calmer holdings.');
+ if(rec>12)add(warn,3,`${rec} trades in the last 200 ticks`,`Each trade pays a fee, a spread and tax on gains. Fees in your recorded history: ${T(fees)}.`);
+ if(tax>200&&tax>fees*2)add(warn,2,`Tax has cost ${T(tax)}, far more than fees (${T(fees)})`,'Selling winners turns gains into 20% tax. Holding longer defers it.');
+ if(cred>300)add(good,1,`You have ${T(cred)} of tax-loss credit`,'Gains up to that amount are untaxed, so realising profits costs less right now.');
+ if(sells.length>=10){const wr=wins/sells.length*100;if(wr>=55)add(good,2,`${wins} of ${sells.length} sells made money`,`A ${f(wr,0)}% win rate in your recorded history. Check that your wins are bigger than your losses.`);else add(warn,2,`Only ${wins} of ${sells.length} sells made money`,'Review why you sell. Losing trades often come from reacting to short-term moves.')}
+ const hold=ks.length?ks.reduce((a,s)=>a+S.t-(S.pos[s].t0??S.t),0)/ks.length:0;if(ks.length&&hold<150)add(warn,1,`You hold positions for about ${f(hold,0)} ticks on average`,'Short holds behave like day trading, which usually loses to fees and tax. Try holding 100+ ticks.');
+ if(S.bot&&S.bot.on){const n=S.tx.filter(x=>x.a).length;add(warn,2,'Auto-invest is on',`It has made ${n} trades in your recorded history, and it only catches what is left of each headline move. Try turning it off, or down to 10%, and compare with the buy-and-hold index.`,'bot','Turn auto-invest off')}
+ if(S.p0){const br=(bench()-1)*100;if(ret<br-1)add(warn,2,'The buy-and-hold index is beating you',`Index ${pc(br)} vs your ${pc(ret)}. Putting part of your money in the index is a low-effort fix.`);else add(good,2,'You are ahead of the buy-and-hold index',`${pc(ret)} vs ${pc(br)}.`)}
+ if(!RL('sp')||!RL('tx')||!RL('lq'))add(warn,1,'Some real-world costs are switched off','Results look better than real life with spreads, taxes or thin markets off. Turn them on in the Real-world costs tab to practise honestly.');
+ if(B.wal>300)add(warn,2,`${T(B.wal)} is waiting in your salary wallet`,'Move it into investing, or buy a business or manager so it keeps earning.','sal','Move salary to investing');
+ if(!BZ.some(b=>B.own[b[0]]>0))add(warn,1,'You have not started a business','The Lemonade Stand costs about \u25ce100 and pays back in roughly 670 ticks, then keeps paying.');
+ BZ.forEach((b,i)=>{const n=B.own[b[0]]||0,mc=b[2]*8;if(n>0&&!(B.mgr&&B.mgr[b[0]])&&B.wal+S.cash>=mc){const pb=mc/(b[3]*n);if(pb<1500)add(warn,2,`Hire a manager for your ${b[1]}`,`It doubles that income for ${T(mc)} and pays back in about ${f(pb,0)} ticks.`,'mgr'+i,'Hire manager')}});
+ warn.sort((a,b)=>b.w-a.w);good.sort((a,b)=>b.w-a.w);
+ const score=Math.max(5,Math.min(100,Math.round(70-warn.reduce((a,o)=>a+o.w*6,0)+good.reduce((a,o)=>a+o.w*4,0)))),H=(S.scans=S.scans||[]);let prev=H[0];if(prev&&S.t-prev.t<5){H.shift();prev=H[0]}H.unshift({t:S.t,sc:score,tot:Math.round(tot),r:Math.round(ret*10)/10,nw:warn.length});S.scans=H.slice(0,12);if(silent)return {score,prev,warn};
+ const row=(o,c)=>`<div style='border-left:3px solid var(${c});padding-left:8px;margin:8px 0'><b>${o.h}</b><br><span class='sub'>${o.x}</span>${o.k?` <button class='ghost' data-k='${o.k}' style='margin-left:6px'>${o.l}</button>`:''}</div>`;
+ $('scan').hidden=false;$('scan').innerHTML=`<div class='ch'>Simulation scan <span class='badge'>tick ${S.t}</span></div><div class='lb' style='padding:12px 14px;max-width:none'><div style='display:flex;gap:14px;align-items:baseline;flex-wrap:wrap'><b style='font-size:34px'>${score}</b><span>out of 100${prev?`, ${score>=prev.sc?'up':'down'} ${Math.abs(score-prev.sc)} since the scan at tick ${prev.t}`:''}</span></div><p>Total ${T(tot)}, a return of ${pc(ret)} on what you put in. ${good.length} things going well and ${warn.length} to improve.</p><p class='sub'>Recent scores, newest first: ${S.scans.slice(0,8).map(h=>h.sc).join(', ')}</p><b>What to improve</b>${warn.map(o=>row(o,'--dn')).join('')||`<p class='sub'>Nothing urgent found.</p>`}<b>What is going well</b>${good.map(o=>row(o,'--up')).join('')||`<p class='sub'>Nothing yet. Make a few moves and scan again.</p>`}<p class='sub'>Practice simulator only. Prices here are random, so this checks habits and risk, not what happens next. Not financial advice.</p><p><button class='ghost' data-k='chk'>Check-ups: ${S.chk===false?'off':'on'} (every 300 ticks)</button></p></div>`;
+ talk(`Scan complete. Your score is ${score} out of 100. ${good.length} things going well and ${warn.length} to improve. Top priority: ${warn.length?warn[0].h:'nothing urgent'}.`,1)}
+$('scan').onclick=e=>{const k=e.target.dataset.k;if(!k)return;if(k=='chk')S.chk=S.chk===false;else if(k=='inc')buyIncome(.25);else if(k=='bot')autoSet(false);else if(k=='sal')$('bmv').click();else if(k.startsWith('mgr'))bizMgr(+k.slice(3));setTimeout(scanSim,60)};
+$('scbtn').onclick=()=>{snd('tab');$('scbtn').textContent='Scan my simulation';scanSim();$('scan').scrollIntoView({behavior:'smooth'})};
+function chkUp(){if(S.chk===false||follower)return;if(S.lastChk==null){S.lastChk=S.t;return}if(S.t-S.lastChk<300)return;S.lastChk=S.t;const r=scanSim(true),d=r.prev?r.score-r.prev.sc:0,tip=r.warn[0]?r.warn[0].h:'nothing urgent';$('scbtn').textContent='Scan my simulation \u2022 new check-up';say(`Check-up: score ${r.score}/100 (${d>=0?'+':''}${d}). Top tip: ${tip}. Press Scan for details.`,1);snd('tick');talk(`Check-up. Your score is ${r.score} out of 100. Top tip: ${tip}.`)}
+setInterval(chkUp,5000);
+$('tourbtn').onclick=()=>tshow(0);
+$('learnbtn').onclick=()=>$('learn').scrollIntoView({behavior:'smooth'});
+
+var HV=null,otype='m',trigFor=null;
+const cap1=t=>t[0].toUpperCase()+t.slice(1);
+function trigUp(o){return o.k=='l'?!o.b:!!o.b}
+function trigWord(o){return trigUp(o)?`rises to ${f(o.px)} or higher`:`falls to ${f(o.px)} or lower`}
+function hitOrd(o){const q=xp(o.s,!!o.b);return trigUp(o)?q>=o.px:q<=o.px}
+function note(m,ok){say(m,ok);toast(m);talk(m,1)}
+function fillOrder(o){const s=o.s,buy=!!o.b,p=xp(s,buy),nm=(o.k=='l'?'limit':'stop')+' '+(buy?'buy':'sell');let q=Math.min(o.q,maxq(s,buy)),done=false;
+ if(buy){if(p*q*(1+FEE)>S.cash){q=Math.floor(S.cash/(p*(1+FEE)));done=true;if(q<1){note(`Your ${nm} for ${s} triggered, but you did not have enough cash, so it was cancelled.`,0);return true}}
+  const v=p*q,fee=v*FEE,ps=S.pos[s]||{q:0,c:0,t0:S.t};ps.c=(ps.c*ps.q+v)/(ps.q+q);ps.q+=q;S.pos[s]=ps;S.cash-=v+fee;S.tx.unshift({t:S.t,b:1,s,q,p,f:fee,tot:v+fee,r:0,o:o.k});snd('buy');note(`${cap1(nm)} filled: bought ${q} ${s} at ${f(p)} (your price ${f(o.px)}).${done&&q<o.q?' Cash ran out, so the rest was cancelled.':''}`,1)}
+ else{const ps=S.pos[s];if(!ps){note(`Your ${nm} for ${s} triggered, but you no longer own any, so it was cancelled.`,0);return true}if(q>=ps.q){q=ps.q;done=true}
+  const v=p*q,fee=v*FEE,r0=(p-ps.c)*q-fee,tax=taxOn(r0),r=r0-tax;ps.q-=q;if(!ps.q)delete S.pos[s];S.cash+=v-fee-tax;S.tx.unshift({t:S.t,b:0,s,q,p,f:fee,tot:v-fee-tax,r,tx:tax,o:o.k});snd(r>=0?'sellwin':'sellloss');note(`${cap1(nm)} filled: sold ${q} ${s} at ${f(p)} (your price ${f(o.px)}). Realised ${sg(r)}.`,r>=0)}
+ labDirty=true;lastPush=0;const left=o.q-q;return done||left<1?true:left}
+function checkOrders(){if(!S.ord||!S.ord.length||follower)return;const keep=[];S.ord.forEach(o=>{if(!hitOrd(o)){keep.push(o);return}const r=fillOrder(o);if(r!==true){o.q=r;keep.push(o)}});S.ord=keep}
+function placeOrder(buy){if(follower)takeOver();const q=Math.floor(+$('qty').value),tp=Math.round(+$('trig').value*100)/100,lim=otype=='l';
+ if(!(q>=1))return say('Enter a whole number of shares, 1 or more.');if(!(tp>0))return say('Enter a price above 0 for the order.');
+ S.ord=S.ord||[];if(S.ord.length>=12)return say('You can have up to 12 open orders. Cancel one first.');
+ if(!buy){const pend=S.ord.filter(o=>o.s==sel&&!o.b).reduce((a,o)=>a+o.q,0),own=(S.pos[sel]||{q:0}).q;if(own-pend<q)return say(`You own ${own} ${sel}${pend?`, and ${pend} are already in open sell orders`:''}, so a sell order for ${q} is too big.`)}
+ const o={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),s:sel,b:buy?1:0,k:otype,q,px:tp,t:S.t},kind=(lim?'Limit ':'Stop ')+(buy?'buy':'sell');S.ord.push(o);snd('tick');
+ say(`${kind} order placed: ${q} ${sel} at ${f(tp)}. It fills when the price ${trigWord(o)}.`,1);
+ talk(`You placed a ${kind} order for ${q} shares of ${sel} at ${f(tp)} tokens. Nothing has traded yet. It fills automatically when the price ${trigWord(o)}. ${!buy&&!lim?'This is a stop-loss. It limits your loss if the price keeps falling, but in a fast drop the fill can be worse than your trigger.':''}`,1);
+ lastPush=0;save();render()}
+function trigHint(){if(otype=='m')return;const tp=+$('trig').value,p=P(sel);$('trigl').textContent=otype=='l'?'Limit price':'Stop trigger price';
+ $('trigh').textContent=!(tp>0)?'Enter a price.':otype=='l'?`Buy fills at ${f(tp)} or lower. Sell fills at ${f(tp)} or higher. ${sel} is ${f(p)} now.`:`Buy triggers at ${f(tp)} or higher. Sell (stop-loss) triggers at ${f(tp)} or lower. ${sel} is ${f(p)} now.`}
+function renderOrders(){const L=S.ord||[];$('ords').innerHTML=L.length?'<b>Open orders</b>'+L.map(o=>`<div><span><b class="${o.b?'up':'dn'}">${o.k=='l'?'Limit':'Stop'} ${o.b?'buy':'sell'}</b> ${o.q} ${o.s} @ ${f(o.px)}<br><span class="sub">Fills at ${trigUp(o)?'≥':'≤'} ${f(o.px)} · now ${f(xp(o.s,!!o.b))}</span></span><button data-x="${o.id}">Cancel</button></div>`).join(''):''}
+$('ords').onclick=e=>{const id=e.target.dataset.x;if(!id)return;if(follower)takeOver();S.ord=(S.ord||[]).filter(o=>o.id!=id);snd('tab');say('Order cancelled.',1);lastPush=0;save();render()};
+$('otype').onclick=e=>{const o=e.target.dataset.o;if(!o)return;snd('tab');otype=o;document.querySelectorAll('#otype button').forEach(b=>b.classList.toggle('on',b.dataset.o==o));$('trigw').hidden=o=='m';trigFor=null;renderTrade();
+ talk(o=='l'?'Limit order. You name your price. A limit buy fills only if the price falls to it or lower, and a limit sell fills only if the price rises to it or higher.':o=='st'?'Stop order. It waits until the price crosses your trigger, then trades. A stop sell below the current price is a stop-loss: it caps how much you can lose if the price keeps falling.':'Market order. It trades straight away at the current bid or ask.',1)};
+const _rtr=renderTrade;renderTrade=function(){_rtr();if(otype!='m'){if(trigFor!=sel){trigFor=sel;$('trig').value=P(sel).toFixed(2)}const tp=+$('trig').value;if(tp>0){const q=Math.max(0,Math.floor(+$('qty').value)||0),v=tp*q;$('tf').textContent=T(v*FEE);$('tt2').textContent=T(v*(1+FEE))+' est.'}}
+ $('buy').textContent=otype=='m'?'Buy':otype=='l'?'Limit buy':'Stop buy';$('sell').textContent=otype=='m'?'Sell':otype=='l'?'Limit sell':'Stop sell';renderOrders();trigHint()};
+$('qty').oninput=renderTrade;$('trig').oninput=renderTrade;
+$('buy').onclick=()=>otype=='m'?trade(1):placeOrder(1);$('sell').onclick=()=>otype=='m'?trade(0):placeOrder(0);
+document.querySelectorAll('.q button').forEach(b=>b.onclick=()=>{const p=+b.dataset.p/100,ask=xp(sel,true),mxb=Math.floor(S.cash/(ask*(1+FEE))),own=(S.pos[sel]||{q:0}).q;$('qty').value=Math.max(1,Math.floor(Math.max(mxb,own)*p)||1);renderTrade()});
+renderList=function(){$('list').innerHTML=D.map(d=>{const p=P(d.s),c=(p/S.open[d.s]-1)*100,a=S.px[d.s].slice(-40),mn=Math.min(...a),rg=(Math.max(...a)-mn)||1,u=a[a.length-1]>=a[0],pts=a.map((v,i)=>`${(i/(a.length-1)*56).toFixed(1)},${(18-(v-mn)/rg*16).toFixed(1)}`).join(' ');
+ return `<button class="row ${d.s==sel?'on':''}" data-s="${d.s}"><div><b>${d.s}</b><small>${d.n}${d.y?' · '+f(d.y*400,1)+'% yield':''}</small></div><svg class="spk ${u?'up':'dn'}" viewBox="0 0 56 20" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><div class="r"><b>${f(p)}</b><small class="${c>=0?'up':'dn'}">${pc(c)}</small></div></button>`}).join('')};
+const _tbl=renderTable;renderTable=function(){_tbl();if(tab!='h')return;const ks=Object.keys(S.pos);if(!ks.length)return;const t=total(),seg=[['Cash',S.cash,'var(--mu)']].concat(ks.map(s=>[s,S.pos[s].q*P(s),`hsl(${(D.findIndex(d=>d.s==s)*67+150)%360} 52% 50%)`])).filter(v=>v[1]>0);
+ $('tbl').insertAdjacentHTML('afterbegin',`<div class="alloc" role="img" aria-label="Where your money is">${seg.map(v=>`<span style="width:${v[1]/t*100}%;background:${v[2]}" title="${v[0]} ${f(v[1]/t*100,1)}%"></span>`).join('')}</div><div class="leg">${seg.map(v=>`<span><i style="background:${v[2]}"></i>${v[0]} ${f(v[1]/t*100,1)}%</span>`).join('')}</div>`)};
+$('cw').addEventListener('pointermove',e=>{HV=e.clientX-$('cw').getBoundingClientRect().left;chart()});$('cw').addEventListener('pointerleave',()=>{HV=null;chart()});
+document.addEventListener('click',e=>{const m=$('sndmenu');if(m.open&&!m.contains(e.target))m.open=false});
+function pickAsset(s){sel=s;snd('sel');mode='a';document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m=='a'));render();const r=document.querySelector(`#list [data-s="${s}"]`);if(r)r.scrollIntoView({block:'nearest',inline:'nearest'})}
+addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||!$('tour').hidden)return;const tg=e.target;if(tg.closest&&tg.closest('input,select,textarea,[contenteditable]'))return;const k=e.key;
+ if(k=='b'||k=='B'){e.preventDefault();$('buy').click()}else if(k=='s'||k=='S'){e.preventDefault();$('sell').click()}
+ else if(k=='ArrowRight'||k=='ArrowLeft'){e.preventDefault();const i=D.findIndex(d=>d.s==sel);pickAsset(D[(i+(k=='ArrowRight'?1:D.length-1))%D.length].s)}
+ else if(k==' '&&(tg===document.body||tg===document.documentElement)){e.preventDefault();const sp=$('speed');if(+sp.value){sp.dataset.prev=sp.value;sp.value='0'}else sp.value=sp.dataset.prev||'1000';setTimer();say(+sp.value?'Market running.':'Market paused. Press Space to resume.',1)}});
+render();
+try{if(!localStorage.getItem('pt-toured'))setTimeout(()=>tshow(0),700)}catch(e){}
+</script>
+</body>
+</html>
