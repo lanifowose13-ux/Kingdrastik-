@@ -19,9 +19,9 @@ Your portfolio is saved on each device. Cross-device sync only runs in the Claud
 - `paper-trader.html`: the whole app. The Claude artifact is published from this file.
 - `app/`: the app manifest, service worker and icons.
 - `scripts/build-app.mjs`: builds `dist/` (the installable app) from the two above. Run `node scripts/build-app.mjs`.
-- `.github/workflows/deploy-app.yml`: builds and deploys `dist/` to GitHub Pages on every push to `main`.
+- `.github/workflows/deploy-app.yml`: builds and deploys `dist/` to GitHub Pages on every push to `main` (or the current working branch).
 
 ## Turning on hosting (once)
 
 In the repository on GitHub: Settings, Pages, then under Build and deployment set Source to **GitHub Actions**.
-After the next push to `main`, the app is live at `https://<owner>.github.io/<repo>/`.
+After the next push, or a manual run of the "Deploy Paper Trader app" workflow under Actions, the app is live at `https://<owner>.github.io/<repo>/`.

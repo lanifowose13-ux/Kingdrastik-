@@ -2,7 +2,7 @@ name: Deploy Paper Trader app
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/artifact-upgrade-5102wu]
   workflow_dispatch:
 
 permissions:
