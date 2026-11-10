@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Crown Rush",
+    "slug": "crown-rush",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#1a1538",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1538"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kingdrastik.crownrush"
+    },
+    "android": {
+      "package": "com.kingdrastik.crownrush",
+      "adaptiveIcon": {
+        "backgroundColor": "#1a1538",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
