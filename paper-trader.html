@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Paper Trader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
 <style>
-:root{--bg:#f3f5f4;--sf:#fff;--ink:#14201c;--mu:#66756f;--ln:#dde3e0;--up:#0f8a5f;--dn:#c8372d;--ac:#16443a;--acx:#fff;--hl:#e9f1ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1512;--sf:#16201c;--ink:#e6efeb;--mu:#8a9c95;--ln:#263530;--up:#3ecf92;--dn:#f0645a;--ac:#3ecf92;--acx:#0e1512;--hl:#1c2b25;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0e1512;--sf:#16201c;--ink:#e6efeb;--mu:#8a9c95;--ln:#263530;--up:#3ecf92;--dn:#f0645a;--ac:#3ecf92;--acx:#0e1512;--hl:#1c2b25;color-scheme:dark}
+/* Layout: one trading desk. Hero scoreboard, then market / chart / ticket, then labs below. */
+:root{--bg:#eef2f0;--sf:#ffffff;--sf2:#f5f8f6;--ink:#0f1a15;--mu:#5c6d66;--ln:#dde5e1;--up:#0d8a5b;--dn:#d0382c;--ac:#0e5a44;--acx:#ffffff;--hl:#e4efea;--glow:#0d8a5b;--sh:0 1px 2px rgba(15,26,21,.05),0 8px 24px rgba(15,26,21,.06);--f-ui:'Geist','Segoe UI',system-ui,sans-serif;--f-num:'Geist Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#090e0c;--sf:#111815;--sf2:#16201c;--ink:#e7f0ec;--mu:#8b9c95;--ln:#22302a;--up:#34d399;--dn:#f87171;--ac:#34d399;--acx:#05120c;--hl:#17251f;--glow:#34d399;--sh:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#090e0c;--sf:#111815;--sf2:#16201c;--ink:#e7f0ec;--mu:#8b9c95;--ln:#22302a;--up:#34d399;--dn:#f87171;--ac:#34d399;--acx:#05120c;--hl:#17251f;--glow:#34d399;--sh:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);color-scheme:dark}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex Sans","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
 .wrap{max-width:1180px;margin:0 auto;padding:16px}
@@ -15,7 +17,7 @@ header{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;justify-co
 h1{font:600 22px "IBM Plex Sans",system-ui,sans-serif;margin:0}
 .sub{color:var(--mu);font-size:12px}
 .stats{display:flex;flex-wrap:wrap;gap:6px 26px}
-.stat b{display:block;font-size:20px;font-weight:600}.stat span{color:var(--mu);font-size:12px}
+.stat b{display:block;font-size:20px;font-weight:600}.stat>span{color:var(--mu);font-size:12px}
 .up{color:var(--up)}.dn{color:var(--dn)}
 .grid{display:grid;grid-template-columns:260px 1fr 270px;gap:12px}
 .card{background:var(--sf);border:1px solid var(--ln);border-radius:8px;overflow:hidden}
@@ -63,12 +65,75 @@ details{border-bottom:1px solid var(--ln)}summary{padding:11px 14px;cursor:point
 .menu>div{position:absolute;z-index:40;top:calc(100% + 6px);left:0;background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px;display:grid;gap:6px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .kbd{font-size:11px;color:var(--mu)}#cw{cursor:crosshair;touch-action:pan-y}
 @media(max-width:980px){.grid{grid-template-columns:1fr}.list{display:flex;overflow-x:auto}.list .row{min-width:220px;border-bottom:0;border-right:1px solid var(--ln)}}
+
+/* ---- modern layer ---- */
+body{font:14px/1.5 var(--f-ui);letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+.wrap{padding-block:18px 40px}
+header{background:radial-gradient(120% 140% at 100% 0%,color-mix(in srgb,var(--glow) 14%,transparent),transparent 55%),var(--sf);border:1px solid var(--ln);border-radius:18px;padding:18px 20px;box-shadow:var(--sh);align-items:stretch;gap:16px 28px}
+.brandrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--ac);color:var(--acx);display:grid;place-items:center;flex:none}
+h1{font:700 22px/1.1 var(--f-ui);letter-spacing:-.02em;text-wrap:balance}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);border:1px solid var(--ln);border-radius:99px;padding:2px 9px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 0 0 color-mix(in srgb,var(--up) 60%,transparent);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.brand .sub{margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,auto));gap:10px;align-self:center}
+.stat{background:var(--sf2);border:1px solid var(--ln);border-radius:12px;padding:9px 14px;min-width:0}
+.stat>span{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.stat b{font:600 19px/1.25 var(--f-num);letter-spacing:-.02em;white-space:nowrap}
+.card{border-radius:14px;box-shadow:var(--sh)}
+.ch{padding:11px 14px;font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mu)}
+.ch button,.ch select,.ch .seg{text-transform:none;letter-spacing:0}
+#tt{color:var(--ink)}
+.grid{gap:14px}
+.row{padding:10px 14px;transition:background .15s}
+.row b{font-weight:600}.row .r b{font-family:var(--f-num);font-size:13px;font-weight:500;border-radius:4px;padding:0 3px}
+.row.on{background:var(--hl);box-shadow:none}.row.on>div:first-child b{color:var(--ac)}
+.fu{animation:fu .9s ease-out}.fd{animation:fd .9s ease-out}
+@keyframes fu{from{background:color-mix(in srgb,var(--up) 28%,transparent)}to{background:transparent}}
+@keyframes fd{from{background:color-mix(in srgb,var(--dn) 28%,transparent)}to{background:transparent}}
+.seg{display:inline-flex;background:var(--sf2);border:1px solid var(--ln);border-radius:10px;padding:3px;gap:2px}
+.tabs button,.seg button{border:0!important;border-radius:7px!important;margin:0!important;padding:5px 11px;font-weight:500;white-space:nowrap;transition:background .15s,color .15s}
+.tabs button:hover,.seg button:hover{color:var(--ink)}
+.tabs button.on,.seg button.on{background:var(--ac);color:var(--acx);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.big{padding:14px 16px 0}.big b{font:600 30px/1.1 var(--f-num);letter-spacing:-.03em}
+#bigc{font:500 14px var(--f-num)}
+.ghost{border-radius:9px;padding:7px 12px;font-weight:500;transition:background .15s,border-color .15s,transform .1s}
+.ghost:hover{background:var(--hl);border-color:color-mix(in srgb,var(--ac) 35%,var(--ln))}
+button:active{transform:scale(.98)}
+input[type=number],select{border-radius:10px;padding:10px 11px;background:var(--sf2);transition:border-color .15s,box-shadow .15s}
+input[type=number]:focus,select:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 22%,transparent)}
+input#qty,input#trig{font:500 16px var(--f-num)}
+.trade{padding:14px;gap:11px}
+.q button{border-radius:8px;padding:6px;font-weight:500;transition:background .15s}.q button:hover{background:var(--hl);color:var(--ink)}
+.bs button{border-radius:11px;padding:12px;font-weight:600;font-size:15px;transition:filter .15s,transform .1s;box-shadow:0 2px 8px color-mix(in srgb,currentColor 0%,transparent)}
+.bs button:hover{filter:brightness(1.08)}
+.buy{background:var(--up);color:var(--acx)!important}.sell{background:var(--dn);color:var(--acx)!important}
+.kv span:last-child,.kv b{font-family:var(--f-num);font-size:12.5px}
+.danger{background:none;border:1px solid color-mix(in srgb,var(--dn) 55%,var(--ln));color:var(--dn);border-radius:10px;padding:10px;font:600 14px var(--f-ui);cursor:pointer;transition:background .15s}
+.danger:hover,.danger[data-arm="1"]{background:color-mix(in srgb,var(--dn) 12%,transparent)}
+.tip{border-top:1px solid var(--ln)}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+td{font-family:var(--f-num);font-size:12.5px}td:first-child,td:nth-child(2){font-family:var(--f-ui)}
+tr.row:hover td{background:var(--hl)}
+.badge{border-radius:99px;font-weight:500}
+#brk{border-radius:14px!important}
+#bt{background:var(--ac);color:var(--acx);border-color:var(--ac);letter-spacing:.06em;font-size:10.5px}
+.jump{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;padding:2px;scrollbar-width:none}
+.jump button{flex:none;border:1px solid var(--ln);background:var(--sf);color:var(--mu);border-radius:99px;padding:6px 13px;font:500 13px var(--f-ui);cursor:pointer;transition:color .15s,border-color .15s}
+.jump button:hover{color:var(--ink);border-color:var(--ac)}
+.menu summary{border-radius:9px;padding:7px 12px;font-weight:500}.menu>div{border-radius:12px}
+#toast{border-radius:12px!important;font-weight:500}
+#tb{border-radius:14px}
+details summary{transition:background .15s}#lc details summary:hover{background:var(--hl)}
+@media(max-width:980px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.stat b{font-size:17px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
- <div><h1>Paper Trader</h1><div class="sub">Practice investing with virtual tokens. Fictional companies, simulated prices, no real money.</div><div class="top" style="margin-top:8px;flex-wrap:wrap"><button class="ghost" id="tourbtn">Take the tour</button><button class="ghost" id="learnbtn">Learn the basics</button><details class="menu" id="sndmenu"><summary>Sound &amp; voice</summary><div><button class="ghost" id="sndbtn" aria-pressed="true">Sound: on</button><button class="ghost" id="psbtn" aria-pressed="true">Price sounds: on</button><button class="ghost" id="nbtn" aria-pressed="false">Narration: off</button><button class="ghost" id="exbtn">Explain now</button></div></details><button class="ghost" id="scbtn">Scan my simulation</button><button class="badge" id="sync" title="Syncs your portfolio between your devices">Sync: this device only</button></div></div>
+ <div class="brand"><div class="brandrow"><span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><rect x="2" y="6" width="3" height="8" rx="1"/><rect x="3" y="3" width="1" height="13"/><rect x="7.5" y="4" width="3" height="6" rx="1"/><rect x="8.5" y="2" width="1" height="10"/><rect x="13" y="7" width="3" height="7" rx="1"/><rect x="14" y="5" width="1" height="11"/></svg></span><h1>Paper Trader</h1><span class="live"><i></i>Simulated market</span></div><div class="sub">Practice investing with virtual tokens. Fictional companies, simulated prices, no real money.</div><div class="top" style="margin-top:8px;flex-wrap:wrap"><button class="ghost" id="tourbtn">Take the tour</button><button class="ghost" id="learnbtn">Learn the basics</button><details class="menu" id="sndmenu"><summary>Sound &amp; voice</summary><div><button class="ghost" id="sndbtn" aria-pressed="true">Sound: on</button><button class="ghost" id="psbtn" aria-pressed="true">Price sounds: on</button><button class="ghost" id="nbtn" aria-pressed="false">Narration: off</button><button class="ghost" id="exbtn">Explain now</button></div></details><button class="ghost" id="scbtn">Scan my simulation</button><button class="ghost" id="thm" title="Switch between automatic, light and dark">Theme: Auto</button><button class="badge" id="sync" title="Syncs your portfolio between your devices">Sync: this device only</button></div></div>
  <div class="stats">
   <div class="stat"><span>Total value</span><b id="tv"></b></div>
   <div class="stat"><span>Cash</span><b id="cash"></b></div>
@@ -77,6 +142,7 @@ details{border-bottom:1px solid var(--ln)}summary{padding:11px 14px;cursor:point
  </div>
 </header>
 <div class="card" id="brk" style="margin-bottom:12px;padding:10px 12px;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap" aria-live="polite"><span class="badge" id="bt">REAL NEWS</span><div style="flex:1;min-width:220px"><b id="bh"></b><div class="sub" id="bx"></div><div id="bc" style="font-size:12px;margin-top:2px"></div></div><div class="top"><button class="ghost" id="bp" aria-label="Previous story">‹</button><button class="ghost" id="bpa">Pause</button><button class="ghost" id="bn" aria-label="Next story">›</button><button class="ghost" id="bgo">Try it here</button></div></div>
+<nav class="jump" aria-label="Jump to a section"><button data-go="tt">Trade</button><button data-go="hold">Holdings</button><button data-go="lab">Strategy lab</button><button data-go="biz">Business Empire</button><button data-go="events">World events</button><button data-go="learn">Lessons</button></nav>
 <div class="grid">
  <section class="card"><div class="ch">Market <span class="badge" id="clock"></span></div><div class="list" id="list"></div>
   <div class="ch" style="border-top:1px solid var(--ln)">Market news</div><div class="news" id="news"></div></section>
@@ -103,12 +169,12 @@ details{border-bottom:1px solid var(--ln)}summary{padding:11px 14px;cursor:point
    <div style="display:grid;grid-template-columns:1fr auto;gap:6px"><select id="swapto"></select><button class="ghost" id="swapbtn">Swap shares</button></div>
    <div id="msg" role="status"></div>
    <div class="ords" id="ords"></div>
-   <button class="sell" id="sellall" style="padding:11px;border:0;border-radius:6px;font:600 14px inherit;font-family:inherit;color:#fff;cursor:pointer">Sell everything</button>
+   <button class="danger" id="sellall">Sell everything</button>
    <button class="ghost" id="topup">Add ◎3,000 tokens</button>
    <button class="ghost" id="reset">Reset simulation</button>
    <div class="kbd">Keys: B buy · S sell · ← → change asset · Space pause</div>
   </div><div class="ch" style="border-top:1px solid var(--ln)">Latest activity</div><div class="news" id="rt"></div></section>
- <section class="card low">
+ <section class="card low" id="hold">
   <div class="ch"><div class="tabs seg" id="tabs"><button data-t="h" class="on">Holdings</button><button data-t="x">Transaction history</button></div></div>
   <div class="tw" id="tbl"></div>
  </section>
@@ -187,13 +253,13 @@ function chart(){const c=$('cv'),r=c.getBoundingClientRect(),dpr=devicePixelRati
  const a=(mode=='pf'?S.pf:mode=='ix'?idxS():S.px[sel]).slice(-range);let mn=Math.min(...a),mx=Math.max(...a);if(mode=='pf'){mn=Math.min(mn,START);mx=Math.max(mx,START)}
  const pad=(mx-mn)*.12||1;mn-=pad;mx+=pad;const L=8,R=60,Tp=10,B=14,X=i=>L+(W-L-R)*(i/Math.max(1,a.length-1)),Y=v=>Tp+(H-Tp-B)*(1-(v-mn)/(mx-mn));
  const up=a[a.length-1]>=(mode=='pf'?START:a[0]),lc=col(up?'--up':'--dn');
- x.font='11px system-ui';x.fillStyle=col('--mu');x.strokeStyle=col('--ln');x.lineWidth=1;
+ x.font="11px 'Geist Mono',ui-monospace,monospace";x.fillStyle=col('--mu');x.strokeStyle=col('--ln');x.lineWidth=1;
  for(let i=0;i<5;i++){const v=mn+(mx-mn)*i/4,y=Y(v);x.beginPath();x.moveTo(L,y);x.lineTo(W-R,y);x.stroke();x.fillText(f(v,mode=='pf'?0:2),W-R+6,y+4)}
  if(mode=='pf'){x.setLineDash([4,4]);x.beginPath();x.moveTo(L,Y(START));x.lineTo(W-R,Y(START));x.strokeStyle=col('--mu');x.stroke();x.setLineDash([])}
- x.beginPath();a.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.strokeStyle=lc;x.lineWidth=2;x.lineJoin='round';x.stroke();
- x.lineTo(X(a.length-1),H-B);x.lineTo(X(0),H-B);x.closePath();const g=x.createLinearGradient(0,Tp,0,H);g.addColorStop(0,lc+'33');g.addColorStop(1,lc+'00');x.fillStyle=g;x.fill();
+ x.beginPath();a.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.strokeStyle=lc;x.lineWidth=2.2;x.lineJoin='round';x.lineCap='round';x.shadowColor=lc+'55';x.shadowBlur=10;x.stroke();x.shadowBlur=0;
+ x.lineTo(X(a.length-1),H-B);x.lineTo(X(0),H-B);x.closePath();const g=x.createLinearGradient(0,Tp,0,H);g.addColorStop(0,lc+'40');g.addColorStop(1,lc+'00');x.fillStyle=g;x.fill();
  if(TA&&mode=='a'){const fl=S.px[sel];[[20,'--ac'],[50,'--mu']].forEach(([n,c])=>{const s=sma(fl,n).slice(-a.length);x.beginPath();let st=0;s.forEach((v,i)=>{if(v==null)return;const qx=X(i),qy=Y(Math.min(mx,Math.max(mn,v)));if(st)x.lineTo(qx,qy);else{x.moveTo(qx,qy);st=1}});x.strokeStyle=col(c);x.lineWidth=1.5;x.setLineDash([5,3]);x.stroke();x.setLineDash([])})}
- const ly=Y(a[a.length-1]);x.fillStyle=lc;x.fillRect(W-R+2,ly-9,R-4,18);x.fillStyle='#fff';x.fillText(f(a[a.length-1],mode=='pf'?0:2),W-R+6,ly+4);
+ const ly=Y(a[a.length-1]);x.fillStyle=lc;x.beginPath();x.roundRect?x.roundRect(W-R+2,ly-10,R-4,20,6):x.rect(W-R+2,ly-10,R-4,20);x.fill();x.fillStyle=col('--acx');x.fillText(f(a[a.length-1],mode=='pf'?0:2),W-R+6,ly+4);
  if(mode=='a'){const o=S.pos[sel];if(o&&o.c>=mn&&o.c<=mx){x.setLineDash([2,3]);x.strokeStyle=col('--ac');x.beginPath();x.moveTo(L,Y(o.c));x.lineTo(W-R,Y(o.c));x.stroke();x.setLineDash([]);x.fillStyle=col('--ac');x.fillText('your avg cost',L+4,Y(o.c)-4)}}
  (S.ord||[]).forEach(o=>{if(mode!='a'||o.s!=sel||o.px<mn||o.px>mx)return;const y=Y(o.px),oc=col(o.b?'--up':'--dn');x.setLineDash([6,4]);x.strokeStyle=oc;x.lineWidth=1;x.beginPath();x.moveTo(L,y);x.lineTo(W-R,y);x.stroke();x.setLineDash([]);x.fillStyle=oc;x.fillText(`${o.k=='l'?'limit':'stop'} ${o.b?'buy':'sell'} ×${o.q}`,L+4,y-4)});
  if(HV!=null&&a.length>1){const i=Math.max(0,Math.min(a.length-1,Math.round((HV-L)/(W-L-R)*(a.length-1)))),hx=X(i),hy=Y(a[i]);x.strokeStyle=col('--mu');x.lineWidth=1;x.setLineDash([3,3]);x.beginPath();x.moveTo(hx,Tp);x.lineTo(hx,H-B);x.stroke();x.setLineDash([]);x.fillStyle=lc;x.beginPath();x.arc(hx,hy,4,0,6.2832);x.fill();
@@ -242,7 +308,7 @@ $('mode').onclick=e=>{const m=e.target.dataset.m;if(!m)return;snd('tab');mode=m;
 $('rng').onclick=e=>{const r=e.target.dataset.r;if(!r)return;snd('tab');range=+r;talk('Showing the last '+(r==400?'400, the maximum,':r)+' price updates. Each update is one simulated minute.',1);document.querySelectorAll('#rng button').forEach(b=>b.classList.toggle('on',b===e.target));render()};
 $('tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;snd('tab');tab=t;talk(t=='h'?'Holdings: what you own, your average cost, and unrealised profit or loss, which only becomes real when you sell.':'Transaction history: every buy, sell and dividend, with fees and realised profit or loss.',1);document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b===e.target));renderTable()};
 $('speed').onchange=setTimer;
-$('reset').onclick=()=>{if(confirm('Reset everything and start again with ◎10,000?')){S=fresh();tick=0;save();say('Simulation reset.',1);renderNews();render()}};
+let rsT=0;$('reset').onclick=()=>{const b=$('reset');if(b.dataset.arm){clearTimeout(rsT);b.dataset.arm='';b.textContent='Reset simulation';if(follower)takeOver();S=fresh();tick=0;lastPush=0;save();say('Simulation reset. You have ◎10,000 again.',1);renderNews();render();return}b.dataset.arm='1';b.textContent='Tap again to reset everything';rsT=setTimeout(()=>{b.dataset.arm='';b.textContent='Reset simulation'},4000)};
 addEventListener('resize',chart);if(window.ResizeObserver)new ResizeObserver(()=>chart()).observe($('cw'));
 function renderRecent(){const el=$('rt');if(!el)return;const l=S.tx.filter(x=>x.b!=3).slice(0,6);el.innerHTML=l.length?l.map(x=>`<div style='border-color:var(${x.b==0?'--dn':'--up'})'><b>${x.b==2?'Dividend':x.b?'Buy':'Sell'}</b> ${x.s} \u00d7${x.q} @ ${f(x.p)}<br><span class='sub'>tick ${x.t} \u00b7 ${T(x.tot)}</span></div>`).join(''):'<div class="sub">Your trades will appear here.</div>'}
 S=load();renderNews();
@@ -320,12 +386,12 @@ function fireEvent(i){if(i==null)i=Math.floor(Math.random()*EV.length);const ev=
 $('evsel').innerHTML=EV.map((v,i)=>`<option value="${i}">${v.h}</option>`).join('');
 $('evgo').onclick=()=>{if(follower)takeOver();fireEvent(+$('evsel').value);lastPush=0;save()};
 const RN=[
-{d:'12 Oct 2026',s:'Reuters, via Virginia Business',h:'Brent crude climbs to around $106 a barrel as attacks on Saudi Arabia and on tankers deepen supply fears',i:2},
-{d:'8 Oct 2026',s:'Stockpil market report',h:'An oil surge reignites inflation worries and pushes government bond yields higher while stocks fall',i:3},
-{d:'10-12 Oct 2026',s:'Nation Thailand',h:'A missile attack on Riyadh airport and more strikes on Saudi Arabia raise fears of a wider Middle East conflict',i:5},
-{d:'5 Oct 2026',s:'Engine, citing ING analysts',h:'G7 countries agree to release up to 100 million barrels of emergency oil stocks over four months',i:13},
-{d:'12 Oct 2026',s:'Reuters, via Virginia Business',h:'Russia and Ukraine announce an energy-infrastructure ceasefire, and extra Russian diesel exports are touted',i:13},
-{d:'8-12 Oct 2026',s:'Market news roundups',h:'The Nasdaq slips on worries about AI revenues as chip and networking stocks weaken, while defensive sectors hold up better',i:12}];
+{d:'5 Nov 2026',s:'AP, via KPTV',h:'AI stocks are hit by a brutal sell-off, with the S&P 500 down about 4.4% in its worst day since April 2025 amid data-center worries after the midterms',i:12},
+{d:'6 Nov 2026',s:'Political.org',h:'A stronger-than-expected October jobs report, with payrolls up 165,000 and unemployment at 4.1%, keeps the Fed on track for another rate hike',i:8},
+{d:'6 Nov 2026',s:'Advisor Perspectives',h:'Treasury yields climb as the solid jobs data backs the case for a Fed rate increase in December',i:0},
+{d:'5 Nov 2026',s:'Trading Economics',h:'Brent crude is down roughly 16% on the week as hopes build for US-Iran talks and calmer Gulf supply',i:13},
+{d:'6 Nov 2026',s:'Gulf News',h:'Oil rebounds as Iran says tankers caught fire on unauthorised Hormuz routes, with several vessel incidents reported in the Gulf this week',i:5},
+{d:'6 Nov 2026',s:'Axios',h:'What the October jobs report means for the Fed: a tighter labour market adds to worries that inflation is not yet beaten',i:3}];
 let bk=0,bpause=false,bcur=0,hold=0;
 function bShow(k,brk){bk=k;const real=k%2==0,o=real?RN[(k/2)%RN.length]:null,i=real?o.i:((k-1)/2)%EV.length,ev=EV[i];bcur=i;
  const chips=Object.keys(ev.e).sort((a,b)=>Math.abs(ev.e[b])-Math.abs(ev.e[a])).slice(0,4).map(s=>`<span class="${ev.e[s]>=0?'up':'dn'}">${s} ${ev.e[s]>=0?'▲':'▼'}</span>`).join(' &nbsp; ');
@@ -508,6 +574,15 @@ addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||!$('tour').hid
  else if(k=='ArrowRight'||k=='ArrowLeft'){e.preventDefault();const i=D.findIndex(d=>d.s==sel);pickAsset(D[(i+(k=='ArrowRight'?1:D.length-1))%D.length].s)}
  else if(k==' '&&(tg===document.body||tg===document.documentElement)){e.preventDefault();const sp=$('speed');if(+sp.value){sp.dataset.prev=sp.value;sp.value='0'}else sp.value=sp.dataset.prev||'1000';setTimer();say(+sp.value?'Market running.':'Market paused. Press Space to resume.',1)}});
 render();
+
+const LP={};const _rl2=renderList;renderList=function(){_rl2();D.forEach(d=>{const p=P(d.s),o=LP[d.s];if(o!=null&&p!==o){const b=document.querySelector(`#list [data-s="${d.s}"] .r b`);if(b)b.classList.add(p>o?'fu':'fd')}LP[d.s]=p})};
+const HOSTTH=document.documentElement.getAttribute('data-theme'),THM=['auto','light','dark'];let thm='auto';try{thm=localStorage.getItem('pt-thm')||'auto'}catch(e){}
+function applyThm(){const r=document.documentElement;if(thm=='auto'){if(HOSTTH)r.setAttribute('data-theme',HOSTTH);else r.removeAttribute('data-theme')}else r.setAttribute('data-theme',thm);$('thm').textContent='Theme: '+cap1(thm);chart()}
+$('thm').onclick=()=>{thm=THM[(THM.indexOf(thm)+1)%3];try{localStorage.setItem('pt-thm',thm)}catch(e){}snd('tab');applyThm()};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>chart());
+document.querySelector('.jump').onclick=e=>{const g=e.target.dataset.go;if(!g)return;snd('tab');const el=$(g);(el.closest('section')||el).scrollIntoView({behavior:'smooth',block:'start'})};
+if(document.fonts)document.fonts.ready.then(()=>chart());
+applyThm();
 try{if(!localStorage.getItem('pt-toured'))setTimeout(()=>tshow(0),700)}catch(e){}
 </script>
 </body>
