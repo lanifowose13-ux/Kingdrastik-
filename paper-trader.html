@@ -127,12 +127,40 @@ tr.row:hover td{background:var(--hl)}
 #tb{border-radius:14px}
 details summary{transition:background .15s}#lc details summary:hover{background:var(--hl)}
 @media(max-width:980px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.stat b{font-size:17px}}
+
+/* ---- app shell (phones and small tablets) ---- */
+#appbar,#tabbar{display:none}
+button,a{-webkit-tap-highlight-color:transparent}
+@media(max-width:980px){
+ body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--bg)}
+ #appbar{display:flex;align-items:center;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:30;padding:10px max(16px,env(safe-area-inset-left,0px)) 10px max(16px,env(safe-area-inset-right,0px));background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--ln)}
+ #appbar .logo{width:28px;height:28px;border-radius:8px}
+ #abt{font:700 18px/1 var(--f-ui);letter-spacing:-.02em;flex:1}
+ .abv{display:grid;justify-items:end;line-height:1.15}.abv b{font:600 15px var(--f-num);letter-spacing:-.02em}.abv small{font:500 11.5px var(--f-num)}
+ .wrap{padding-block:12px 16px}
+ .jump,.kbd{display:none}
+ body[data-tab] .tabsec:not([data-tabsec~="x"]){animation:scr .22s ease-out}
+ body[data-tab="mkt"] .tabsec:not([data-tabsec="mkt"]),body[data-tab="trade"] .tabsec:not([data-tabsec="trade"]),body[data-tab="pf"] .tabsec:not([data-tabsec="pf"]),body[data-tab="explore"] .tabsec:not([data-tabsec="explore"]),body[data-tab="learn"] .tabsec:not([data-tabsec="learn"]){display:none!important}
+ @keyframes scr{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+ .list{display:block}.list .row{min-width:0;border-right:0;border-bottom:1px solid var(--ln);padding:13px 16px}
+ .list .row b{font-size:15px}.spk{width:64px;height:24px}
+ #cw{min-height:46vh}
+ header{margin-bottom:12px}
+ #tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:35;padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px));background:color-mix(in srgb,var(--sf) 86%,transparent);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-top:1px solid var(--ln)}
+ #tabbar button{display:grid;justify-items:center;gap:3px;border:0;background:none;color:var(--mu);font:500 11px var(--f-ui);padding:6px 0 4px;border-radius:12px;cursor:pointer;transition:color .15s}
+ #tabbar button svg{padding:3px 14px;box-sizing:content-box;border-radius:99px;transition:background .2s}
+ #tabbar button[aria-current="page"]{color:var(--ink)}
+ #tabbar button[aria-current="page"] svg{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac)}
+ #tb{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div id="appbar"><span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor"><rect x="2" y="6" width="3" height="8" rx="1"/><rect x="3" y="3" width="1" height="13"/><rect x="7.5" y="4" width="3" height="6" rx="1"/><rect x="8.5" y="2" width="1" height="10"/><rect x="13" y="7" width="3" height="7" rx="1"/><rect x="14" y="5" width="1" height="11"/></svg></span><b id="abt">Markets</b><span class="abv"><b id="abtv"></b><small id="abpl"></small></span></div>
 <div class="wrap">
-<header>
+<header class="tabsec" data-tabsec="pf">
  <div class="brand"><div class="brandrow"><span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><rect x="2" y="6" width="3" height="8" rx="1"/><rect x="3" y="3" width="1" height="13"/><rect x="7.5" y="4" width="3" height="6" rx="1"/><rect x="8.5" y="2" width="1" height="10"/><rect x="13" y="7" width="3" height="7" rx="1"/><rect x="14" y="5" width="1" height="11"/></svg></span><h1>Paper Trader</h1><span class="live"><i></i>Simulated market</span></div><div class="sub">Practice investing with virtual tokens. Fictional companies, simulated prices, no real money.</div><div class="top" style="margin-top:8px;flex-wrap:wrap"><button class="ghost" id="tourbtn">Take the tour</button><button class="ghost" id="learnbtn">Learn the basics</button><details class="menu" id="sndmenu"><summary>Sound &amp; voice</summary><div><button class="ghost" id="sndbtn" aria-pressed="true">Sound: on</button><button class="ghost" id="psbtn" aria-pressed="true">Price sounds: on</button><button class="ghost" id="nbtn" aria-pressed="false">Narration: off</button><button class="ghost" id="exbtn">Explain now</button></div></details><button class="ghost" id="scbtn">Scan my simulation</button><button class="ghost" id="thm" title="Switch between automatic, light and dark">Theme: Auto</button><button class="badge" id="sync" title="Syncs your portfolio between your devices">Sync: this device only</button></div></div>
  <div class="stats">
   <div class="stat"><span>Total value</span><b id="tv"></b></div>
@@ -141,12 +169,12 @@ details summary{transition:background .15s}#lc details summary:hover{background:
   <div class="stat"><span>Total profit / loss</span><b id="pl"></b></div>
  </div>
 </header>
-<div class="card" id="brk" style="margin-bottom:12px;padding:10px 12px;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap" aria-live="polite"><span class="badge" id="bt">REAL NEWS</span><div style="flex:1;min-width:220px"><b id="bh"></b><div class="sub" id="bx"></div><div id="bc" style="font-size:12px;margin-top:2px"></div></div><div class="top"><button class="ghost" id="bp" aria-label="Previous story">‹</button><button class="ghost" id="bpa">Pause</button><button class="ghost" id="bn" aria-label="Next story">›</button><button class="ghost" id="bgo">Try it here</button></div></div>
+<div class="card tabsec" data-tabsec="mkt" id="brk" style="margin-bottom:12px;padding:10px 12px;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap" aria-live="polite"><span class="badge" id="bt">REAL NEWS</span><div style="flex:1;min-width:220px"><b id="bh"></b><div class="sub" id="bx"></div><div id="bc" style="font-size:12px;margin-top:2px"></div></div><div class="top"><button class="ghost" id="bp" aria-label="Previous story">‹</button><button class="ghost" id="bpa">Pause</button><button class="ghost" id="bn" aria-label="Next story">›</button><button class="ghost" id="bgo">Try it here</button></div></div>
 <nav class="jump" aria-label="Jump to a section"><button data-go="tt">Trade</button><button data-go="hold">Holdings</button><button data-go="lab">Strategy lab</button><button data-go="biz">Business Empire</button><button data-go="events">World events</button><button data-go="learn">Lessons</button></nav>
 <div class="grid">
- <section class="card"><div class="ch">Market <span class="badge" id="clock"></span></div><div class="list" id="list"></div>
+ <section class="card tabsec" data-tabsec="mkt" id="mkt"><div class="ch">Market <span class="badge" id="clock"></span></div><div class="list" id="list"></div>
   <div class="ch" style="border-top:1px solid var(--ln)">Market news</div><div class="news" id="news"></div></section>
- <section class="card">
+ <section class="card tabsec" data-tabsec="trade" id="chartc">
   <div class="ch"><div class="tabs seg" id="mode"><button data-m="a" class="on">Asset price</button><button data-m="pf">My portfolio</button><button data-m="ix">Market index</button></div>
    <div class="top"><div class="seg" id="rng"><button data-r="60">60</button><button data-r="150" class="on">150</button><button data-r="400">Max</button></div>
    <select id="speed" style="width:auto" aria-label="Speed"><option value="2000">Slow</option><option value="1000" selected>Normal</option><option value="300">Fast</option><option value="0">Paused</option></select></div></div>
@@ -154,7 +182,7 @@ details summary{transition:background .15s}#lc details summary:hover{background:
   <div id="cw"><canvas id="cv"></canvas></div>
   <div class="tip" id="tip"></div>
  </section>
- <section class="card"><div class="ch" id="tt">Trade</div>
+ <section class="card tabsec" data-tabsec="trade" id="trd"><div class="ch" id="tt">Trade</div>
   <div class="trade">
    <div><label for="qty">Quantity (shares)</label><input id="qty" type="number" min="1" step="1" value="10" inputmode="numeric"></div>
    <div><label>Order type</label><div class="seg" id="otype" style="margin-top:4px"><button data-o="m" class="on">Market</button><button data-o="l">Limit</button><button data-o="st">Stop</button></div></div>
@@ -174,17 +202,18 @@ details summary{transition:background .15s}#lc details summary:hover{background:
    <button class="ghost" id="reset">Reset simulation</button>
    <div class="kbd">Keys: B buy · S sell · ← → change asset · Space pause</div>
   </div><div class="ch" style="border-top:1px solid var(--ln)">Latest activity</div><div class="news" id="rt"></div></section>
- <section class="card low" id="hold">
+ <section class="card low tabsec" data-tabsec="pf" id="hold">
   <div class="ch"><div class="tabs seg" id="tabs"><button data-t="h" class="on">Holdings</button><button data-t="x">Transaction history</button></div></div>
   <div class="tw" id="tbl"></div>
  </section>
- <section class='card low' id='lab'><div class='ch' style='overflow-x:auto'><div class='tabs seg' id='sltabs'><button data-l='bh' class='on'>Buy and hold</button><button data-l='ix'>Index investing</button><button data-l='fa'>Fundamental analysis</button><button data-l='ta'>Technical analysis</button><button data-l='dt'>Day trading</button><button data-l='au'>Auto-invest on news</button><button data-l='rw'>Real-world costs</button><button data-l='in'>Income assets</button></div></div><div class='tip' id='sb'></div><div class='lb' id='sl' style='padding:12px 14px;max-width:none'></div></section>
- <section class="card low" id="scan" hidden></section>
- <section class="card low" id="biz"><div class="ch">Business Empire <span class="badge" id="bm">Normal times</span></div><div class="tip">Spend tokens on businesses that pay you a salary every tick. Move the salary into your investing cash to grow your portfolio. World events hit your income too: a recession or health scare causes a slump, and a strong jobs report brings a boom.</div><div style="padding:12px 14px;display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center"><div class="stat"><span>Salary wallet</span><b id="bw"></b></div><div class="stat"><span>Salary per tick</span><b id="br"></b></div><div class="stat"><span>Earned so far</span><b id="bl"></b></div><div class="top"><button class="ghost" id="bsh">Work a shift</button><button id="bmv" style="background:var(--up);color:#fff;border:0;border-radius:6px;padding:8px 12px;font:inherit;cursor:pointer">Move salary to investing</button></div></div><div class="sub" id="bnw" style="padding:0 14px 8px"></div><div id="bz" style="display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));padding:0 14px 14px"></div></section>
- <section class="card low" id="events"><div class="ch">World events <span class="top"><select id="evsel" style="width:auto;max-width:46vw" aria-label="Choose an event"></select><button class="ghost" id="evgo">Trigger event</button><button class="ghost" id="autobtn">Auto-invest: off</button></span></div><div class="tip">Real-world events move whole sectors, not single companies. They also happen at random while the market runs. Size and direction here are simplified for learning, and real reactions vary.</div><div class="news" id="evs"></div></section>
- <section class="card low" id="learn"><div class="ch">Learn the basics</div><div id="lc"></div></section>
+ <section class='card low tabsec' data-tabsec='explore' id='lab'><div class='ch' style='overflow-x:auto'><div class='tabs seg' id='sltabs'><button data-l='bh' class='on'>Buy and hold</button><button data-l='ix'>Index investing</button><button data-l='fa'>Fundamental analysis</button><button data-l='ta'>Technical analysis</button><button data-l='dt'>Day trading</button><button data-l='au'>Auto-invest on news</button><button data-l='rw'>Real-world costs</button><button data-l='in'>Income assets</button></div></div><div class='tip' id='sb'></div><div class='lb' id='sl' style='padding:12px 14px;max-width:none'></div></section>
+ <section class="card low tabsec" data-tabsec="pf" id="scan" hidden></section>
+ <section class="card low tabsec" data-tabsec="explore" id="biz"><div class="ch">Business Empire <span class="badge" id="bm">Normal times</span></div><div class="tip">Spend tokens on businesses that pay you a salary every tick. Move the salary into your investing cash to grow your portfolio. World events hit your income too: a recession or health scare causes a slump, and a strong jobs report brings a boom.</div><div style="padding:12px 14px;display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center"><div class="stat"><span>Salary wallet</span><b id="bw"></b></div><div class="stat"><span>Salary per tick</span><b id="br"></b></div><div class="stat"><span>Earned so far</span><b id="bl"></b></div><div class="top"><button class="ghost" id="bsh">Work a shift</button><button id="bmv" style="background:var(--up);color:#fff;border:0;border-radius:6px;padding:8px 12px;font:inherit;cursor:pointer">Move salary to investing</button></div></div><div class="sub" id="bnw" style="padding:0 14px 8px"></div><div id="bz" style="display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));padding:0 14px 14px"></div></section>
+ <section class="card low tabsec" data-tabsec="explore" id="events"><div class="ch">World events <span class="top"><select id="evsel" style="width:auto;max-width:46vw" aria-label="Choose an event"></select><button class="ghost" id="evgo">Trigger event</button><button class="ghost" id="autobtn">Auto-invest: off</button></span></div><div class="tip">Real-world events move whole sectors, not single companies. They also happen at random while the market runs. Size and direction here are simplified for learning, and real reactions vary.</div><div class="news" id="evs"></div></section>
+ <section class="card low tabsec" data-tabsec="learn" id="learn"><div class="ch">Learn the basics</div><div id="lc"></div></section>
 </div>
 </div>
+<nav id="tabbar" aria-label="App sections"><button data-tab="mkt"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8 3 3"/><path d="M3 21h18"/></svg><span>Markets</span></button><button data-tab="trade"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v14m0 0l-3-3m3 3l3-3"/><path d="M17 20V6m0 0l-3 3m3-3l3 3"/></svg><span>Trade</span></button><button data-tab="pf"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><span>Portfolio</span></button><button data-tab="explore"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Explore</span></button><button data-tab="learn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button></nav>
 <div id="toast" role="status" style="display:none;position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));background:var(--sf);color:var(--ink);border:1px solid var(--ac);border-radius:8px;padding:10px 14px;z-index:60;width:min(420px,calc(100% - 24px));box-shadow:0 8px 30px rgba(0,0,0,.25)"></div>
 <div id="tour" hidden><div id="tb"></div></div>
 <script>
@@ -386,12 +415,12 @@ function fireEvent(i){if(i==null)i=Math.floor(Math.random()*EV.length);const ev=
 $('evsel').innerHTML=EV.map((v,i)=>`<option value="${i}">${v.h}</option>`).join('');
 $('evgo').onclick=()=>{if(follower)takeOver();fireEvent(+$('evsel').value);lastPush=0;save()};
 const RN=[
-{d:'5 Nov 2026',s:'AP, via KPTV',h:'AI stocks are hit by a brutal sell-off, with the S&P 500 down about 4.4% in its worst day since April 2025 amid data-center worries after the midterms',i:12},
-{d:'6 Nov 2026',s:'Political.org',h:'A stronger-than-expected October jobs report, with payrolls up 165,000 and unemployment at 4.1%, keeps the Fed on track for another rate hike',i:8},
-{d:'6 Nov 2026',s:'Advisor Perspectives',h:'Treasury yields climb as the solid jobs data backs the case for a Fed rate increase in December',i:0},
-{d:'5 Nov 2026',s:'Trading Economics',h:'Brent crude is down roughly 16% on the week as hopes build for US-Iran talks and calmer Gulf supply',i:13},
-{d:'6 Nov 2026',s:'Gulf News',h:'Oil rebounds as Iran says tankers caught fire on unauthorised Hormuz routes, with several vessel incidents reported in the Gulf this week',i:5},
-{d:'6 Nov 2026',s:'Axios',h:'What the October jobs report means for the Fed: a tighter labour market adds to worries that inflation is not yet beaten',i:3}];
+{d:'10 Nov 2026',s:'Benzinga',h:'October CPI runs hot, with headline prices up 0.4% and core up 0.3%, both above forecasts, pushing the 10-year Treasury yield to about 5%',i:3},
+{d:'10 Nov 2026',s:'Yahoo Finance',h:'The Dow, S&P 500 and Nasdaq slip as the hot inflation report raises the odds of a Fed rate hike in December',i:0},
+{d:'10 Nov 2026',s:'TradingKey',h:'Nvidia falls more than 5% to lead tech shares lower after the inflation data, while AMD and Broadcom buck the trend',i:12},
+{d:'10 Nov 2026',s:'CNBC',h:'Brent crude briefly slips below $90 a barrel for the first time since August on hopes of easing tensions with Iran',i:13},
+{d:'8 Nov 2026',s:'Nvidia',h:'Nvidia\'s board opens an independent probe after reports that CEO Jensen Huang was targeted by a foreign intelligence effort, and he stays in charge during the review',i:12},
+{d:'6 Nov 2026',s:'Gulf News',h:'Oil rebounds as Iran says tankers caught fire on unauthorised Hormuz routes, with several vessel incidents reported in the Gulf this week',i:5}];
 let bk=0,bpause=false,bcur=0,hold=0;
 function bShow(k,brk){bk=k;const real=k%2==0,o=real?RN[(k/2)%RN.length]:null,i=real?o.i:((k-1)/2)%EV.length,ev=EV[i];bcur=i;
  const chips=Object.keys(ev.e).sort((a,b)=>Math.abs(ev.e[b])-Math.abs(ev.e[a])).slice(0,4).map(s=>`<span class="${ev.e[s]>=0?'up':'dn'}">${s} ${ev.e[s]>=0?'▲':'▼'}</span>`).join(' &nbsp; ');
@@ -583,6 +612,20 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>chart()
 document.querySelector('.jump').onclick=e=>{const g=e.target.dataset.go;if(!g)return;snd('tab');const el=$(g);(el.closest('section')||el).scrollIntoView({behavior:'smooth',block:'start'})};
 if(document.fonts)document.fonts.ready.then(()=>chart());
 applyThm();
+
+const MQ=matchMedia('(max-width:980px)'),isMob=()=>MQ.matches,TABN={mkt:'Markets',trade:'Trade',pf:'Portfolio',explore:'Explore',learn:'Learn'};
+function setTab(t,quiet){if(!TABN[t])t='mkt';document.body.dataset.tab=t;document.querySelectorAll('#tabbar button').forEach(b=>b.dataset.tab==t?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));$('abt').textContent=t=='trade'?'Trade '+sel:TABN[t];
+ try{localStorage.setItem('pt-tab',t)}catch(e){}if(!quiet){snd('tab');buzz(8);if(isMob())scrollTo({top:0})}}
+function buzz(ms){try{if(SND&&navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
+$('tabbar').onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab)};
+document.addEventListener('click',e=>{if(!isMob()||!e.target.closest('[data-s]'))return;if(e.target.closest('#hold,#mkt,#lab'))setTimeout(()=>setTab('trade'),0)},true);
+const _rs2=renderStats;renderStats=function(){_rs2();const t=total(),pl=t-START-(S.dep||0);$('abtv').textContent=T(t);$('abpl').innerHTML=`<span class="${pl>=0?'up':'dn'}">${sg(pl)} · ${pc(pl/(START+(S.dep||0))*100)}</span>`;if(document.body.dataset.tab=='trade')$('abt').textContent='Trade '+sel};
+const TABOF=el=>{const s=el&&el.closest('.tabsec');return s?s.dataset.tabsec.split(' ')[0]:null};
+const _tsh=tshow;tshow=function(i){if(i>=0&&i<TS.length&&isMob()){const t=TABOF(document.querySelector(TS[i][0]));if(t)setTab(t,1)}else if(isMob()&&ti>=0)setTab('mkt',1);_tsh(i)};
+$('scbtn').addEventListener('click',()=>{if(isMob())setTab('pf',1)},true);
+$('learnbtn').addEventListener('click',()=>{if(isMob())setTab('learn',1)},true);
+['buy','sell'].forEach(id=>$(id).addEventListener('click',()=>buzz(15)));
+(()=>{let t='mkt';try{t=localStorage.getItem('pt-tab')||'mkt'}catch(e){}setTab(t,1);render()})();
 try{if(!localStorage.getItem('pt-toured'))setTimeout(()=>tshow(0),700)}catch(e){}
 </script>
 </body>
