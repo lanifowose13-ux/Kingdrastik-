@@ -7,7 +7,7 @@ const build = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
 
 const head = `
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0e5a44">
+<meta name="theme-color" content="#2B2A8F">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
