@@ -154,6 +154,12 @@ button,a{-webkit-tap-highlight-color:transparent}
  #tabbar button[aria-current="page"] svg{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac)}
  #tb{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
+
+/* ---- explain popups ---- */
+#xtip{position:fixed;z-index:70;max-width:min(320px,calc(100vw - 24px));background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 12px;font:13px/1.45 var(--f-ui);box-shadow:0 10px 30px rgba(0,0,0,.3);pointer-events:none;animation:xin .14s ease-out}
+#xtip b{display:block;font-weight:600;margin-bottom:2px;color:var(--bg)}
+#xtip span{color:color-mix(in srgb,var(--bg) 82%,var(--ink))}
+@keyframes xin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -161,7 +167,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 <div id="appbar"><span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor"><rect x="2" y="6" width="3" height="8" rx="1"/><rect x="3" y="3" width="1" height="13"/><rect x="7.5" y="4" width="3" height="6" rx="1"/><rect x="8.5" y="2" width="1" height="10"/><rect x="13" y="7" width="3" height="7" rx="1"/><rect x="14" y="5" width="1" height="11"/></svg></span><b id="abt">Markets</b><span class="abv"><b id="abtv"></b><small id="abpl"></small></span></div>
 <div class="wrap">
 <header class="tabsec" data-tabsec="pf">
- <div class="brand"><div class="brandrow"><span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><rect x="2" y="6" width="3" height="8" rx="1"/><rect x="3" y="3" width="1" height="13"/><rect x="7.5" y="4" width="3" height="6" rx="1"/><rect x="8.5" y="2" width="1" height="10"/><rect x="13" y="7" width="3" height="7" rx="1"/><rect x="14" y="5" width="1" height="11"/></svg></span><h1>Paper Trader</h1><span class="live"><i></i>Simulated market</span></div><div class="sub">Practice investing with virtual tokens. Fictional companies, simulated prices, no real money.</div><div class="top" style="margin-top:8px;flex-wrap:wrap"><button class="ghost" id="tourbtn">Take the tour</button><button class="ghost" id="learnbtn">Learn the basics</button><details class="menu" id="sndmenu"><summary>Sound &amp; voice</summary><div><button class="ghost" id="sndbtn" aria-pressed="true">Sound: on</button><button class="ghost" id="psbtn" aria-pressed="true">Price sounds: on</button><button class="ghost" id="nbtn" aria-pressed="false">Narration: off</button><button class="ghost" id="exbtn">Explain now</button></div></details><button class="ghost" id="scbtn">Scan my simulation</button><button class="ghost" id="thm" title="Switch between automatic, light and dark">Theme: Auto</button><button class="badge" id="sync" title="Syncs your portfolio between your devices">Sync: this device only</button></div></div>
+ <div class="brand"><div class="brandrow"><span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><rect x="2" y="6" width="3" height="8" rx="1"/><rect x="3" y="3" width="1" height="13"/><rect x="7.5" y="4" width="3" height="6" rx="1"/><rect x="8.5" y="2" width="1" height="10"/><rect x="13" y="7" width="3" height="7" rx="1"/><rect x="14" y="5" width="1" height="11"/></svg></span><h1>Paper Trader</h1><span class="live"><i></i>Simulated market</span></div><div class="sub">Practice investing with virtual tokens. Fictional companies, simulated prices, no real money.</div><div class="top" style="margin-top:8px;flex-wrap:wrap"><button class="ghost" id="tourbtn">Take the tour</button><button class="ghost" id="learnbtn">Learn the basics</button><details class="menu" id="sndmenu"><summary>Sound &amp; voice</summary><div><button class="ghost" id="sndbtn" aria-pressed="true">Sound: on</button><button class="ghost" id="psbtn" aria-pressed="true">Price sounds: on</button><button class="ghost" id="nbtn" aria-pressed="false">Narration: off</button><button class="ghost" id="exbtn">Explain now</button></div></details><button class="ghost" id="scbtn">Scan my simulation</button><button class="ghost" id="xpl" aria-pressed="true">Explain: on</button><button class="ghost" id="thm" title="Switch between automatic, light and dark">Theme: Auto</button><button class="badge" id="sync" title="Syncs your portfolio between your devices">Sync: this device only</button></div></div>
  <div class="stats">
   <div class="stat"><span>Total value</span><b id="tv"></b></div>
   <div class="stat"><span>Cash</span><b id="cash"></b></div>
@@ -215,6 +221,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 </div>
 <nav id="tabbar" aria-label="App sections"><button data-tab="mkt"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8 3 3"/><path d="M3 21h18"/></svg><span>Markets</span></button><button data-tab="trade"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v14m0 0l-3-3m3 3l3-3"/><path d="M17 20V6m0 0l-3 3m3-3l3 3"/></svg><span>Trade</span></button><button data-tab="pf"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><span>Portfolio</span></button><button data-tab="explore"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Explore</span></button><button data-tab="learn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Learn</span></button></nav>
 <div id="toast" role="status" style="display:none;position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));background:var(--sf);color:var(--ink);border:1px solid var(--ac);border-radius:8px;padding:10px 14px;z-index:60;width:min(420px,calc(100% - 24px));box-shadow:0 8px 30px rgba(0,0,0,.25)"></div>
+<div id="xtip" role="tooltip" hidden><b id="xtt"></b><span id="xtx"></span></div>
 <div id="tour" hidden><div id="tb"></div></div>
 <script>
 const $=id=>document.getElementById(id),START=10000,FEE=.001,KEY='paper-trader-v1';
@@ -366,7 +373,7 @@ const TS=[
 ['.trade','Trade panel','Enter a quantity (or use 25%, 50%, Max), check the order total including the 0.1% fee, then press Buy or Sell. Switch to Limit or Stop to name your own price and let the order wait.'],
 ['#news','News and shocks','Headlines can jolt a price suddenly. Real markets do this too, and you cannot predict it.'],
 ['#tbl','Holdings and history','Holdings show unrealised profit/loss per asset. The history tab lists every trade with fees and realised profit/loss.'],
-['#brk','Breaking news','This strip cycles between real headlines (a dated snapshot, not live) and simulated events. Press the button to see how that kind of event would hit these fictional companies.'],['#biz','Business Empire','A small tycoon game. Buy businesses with your tokens, collect the salary they pay, and move it into your investing cash.'],['#lab','Strategy lab','Eight ways to invest and the costs that come with them, from buy and hold to auto-investing on news. Each has a live tool, and the bar compares you with a buy-and-hold index.'],['#events','World events','Real-world events such as interest rate changes, oil shocks or health scares move whole sectors. Guess the winners and losers, then trigger one to compare.'],['#learn','Learn the basics','Twelve short lessons on risk, order types, diversification, costs, strategies and mistakes, plus a three-week practice plan.']];
+['#brk','Breaking news','This strip cycles between real headlines (a dated snapshot, not live) and simulated events. Press the button to see how that kind of event would hit these fictional companies.'],['#biz','Business Empire','A small tycoon game. Buy businesses with your tokens, collect the salary they pay, and move it into your investing cash.'],['#lab','Strategy lab','Eight ways to invest and the costs that come with them, from buy and hold to auto-investing on news. Each has a live tool, and the bar compares you with a buy-and-hold index.'],['#events','World events','Real-world events such as interest rate changes, oil shocks or health scares move whole sectors. Guess the winners and losers, then trigger one to compare.'],['#xpl','Explain mode','Hover over anything, or tap it on a phone, and a popup explains what it is. Turn it off here once you know your way around.'],['#learn','Learn the basics','Twelve short lessons on risk, order types, diversification, costs, strategies and mistakes, plus a three-week practice plan.']];
 let ti=-1;
 function tshow(i){document.querySelectorAll('.tg').forEach(e=>e.classList.remove('tg'));
  if(i<0||i>=TS.length){stopTalk();$('tour').hidden=true;ti=-1;try{localStorage.setItem('pt-toured','1')}catch(e){}return}
@@ -415,12 +422,12 @@ function fireEvent(i){if(i==null)i=Math.floor(Math.random()*EV.length);const ev=
 $('evsel').innerHTML=EV.map((v,i)=>`<option value="${i}">${v.h}</option>`).join('');
 $('evgo').onclick=()=>{if(follower)takeOver();fireEvent(+$('evsel').value);lastPush=0;save()};
 const RN=[
-{d:'10 Nov 2026',s:'Benzinga',h:'October CPI runs hot, with headline prices up 0.4% and core up 0.3%, both above forecasts, pushing the 10-year Treasury yield to about 5%',i:3},
-{d:'10 Nov 2026',s:'Yahoo Finance',h:'The Dow, S&P 500 and Nasdaq slip as the hot inflation report raises the odds of a Fed rate hike in December',i:0},
-{d:'10 Nov 2026',s:'TradingKey',h:'Nvidia falls more than 5% to lead tech shares lower after the inflation data, while AMD and Broadcom buck the trend',i:12},
-{d:'10 Nov 2026',s:'CNBC',h:'Brent crude briefly slips below $90 a barrel for the first time since August on hopes of easing tensions with Iran',i:13},
-{d:'8 Nov 2026',s:'Nvidia',h:'Nvidia\'s board opens an independent probe after reports that CEO Jensen Huang was targeted by a foreign intelligence effort, and he stays in charge during the review',i:12},
-{d:'6 Nov 2026',s:'Gulf News',h:'Oil rebounds as Iran says tankers caught fire on unauthorised Hormuz routes, with several vessel incidents reported in the Gulf this week',i:5}];
+{d:'16 Nov 2026',s:'CNBC',h:'Japan\'s economy unexpectedly shrinks in the third quarter, contracting 0.1% annualised as high energy costs weigh on households',i:9},
+{d:'16 Nov 2026',s:'Reuters',h:'Asian shares slip as investors brace for Nvidia\'s results this week, a key test of the AI-driven tech rally',i:12},
+{d:'16 Nov 2026',s:'Investing.com',h:'Oil slips about 1% to near $95 a barrel as traders look to recovering Middle East supplies',i:13},
+{d:'14 Nov 2026',s:'The Motley Fool',h:'A half-point Fed rate rise in December looks more likely after core inflation rose 0.3% in October, the level Governor Waller said would justify a bigger move',i:0},
+{d:'14 Nov 2026',s:'Fortune',h:'The Fed\'s fight against inflation risks dragging on as the Iran conflict persists and tight diesel and petrol supplies keep fuel prices high',i:3},
+{d:'13 Nov 2026',s:'Iran International',h:'Iran\'s Revolutionary Guards claim a strike on a US radar in Bahrain, while US Central Command says it shot down two drones with no damage',i:5}];
 let bk=0,bpause=false,bcur=0,hold=0;
 function bShow(k,brk){bk=k;const real=k%2==0,o=real?RN[(k/2)%RN.length]:null,i=real?o.i:((k-1)/2)%EV.length,ev=EV[i];bcur=i;
  const chips=Object.keys(ev.e).sort((a,b)=>Math.abs(ev.e[b])-Math.abs(ev.e[a])).slice(0,4).map(s=>`<span class="${ev.e[s]>=0?'up':'dn'}">${s} ${ev.e[s]>=0?'▲':'▼'}</span>`).join(' &nbsp; ');
@@ -626,6 +633,111 @@ $('scbtn').addEventListener('click',()=>{if(isMob())setTab('pf',1)},true);
 $('learnbtn').addEventListener('click',()=>{if(isMob())setTab('learn',1)},true);
 ['buy','sell'].forEach(id=>$(id).addEventListener('click',()=>buzz(15)));
 (()=>{let t='mkt';try{t=localStorage.getItem('pt-tab')||'mkt'}catch(e){}setTab(t,1);render()})();
+
+/* ---- explain popups: hover (mouse), tap (touch) or keyboard focus ---- */
+const XID={
+ tourbtn:['Take the tour','A step-by-step walk through every part of the app, with each area highlighted in turn.'],
+ learnbtn:['Learn the basics','Jumps to twelve short lessons on how investing works, from what a share is to order types.'],
+ sndmenu:['Sound & voice','Settings for sound effects, price-tick sounds and spoken narration.'],
+ sndbtn:['Sound effects','Turns the chimes for trades, dividends, news and button presses on or off.'],
+ psbtn:['Price sounds','Plays a soft rising or falling note when the selected asset moves noticeably.'],
+ nbtn:['Narration','A voice explains your trades, dividends, news and big price moves as they happen.'],
+ exbtn:['Explain now','A voice reads out a summary of your portfolio, the market and the selected asset right now.'],
+ scbtn:['Scan my simulation','Checks your habits and risk: cash levels, diversification, fees, income and more. Gives a score out of 100 with tips.'],
+ xpl:['Explain mode','These popups. Turn them off once you know your way around.'],
+ thm:['Theme','Cycles between Auto (follows your device), Light and Dark.'],
+ sync:['Sync','In the Claude artifact, your portfolio is saved to your account and follows you between devices. Tap it to take control if another device is driving the market.'],
+ tv:['Total value','Your cash plus the current market value of everything you own. This is the number to grow.'],
+ cash:['Cash','Tokens not invested. Cash is safe from price swings but earns nothing unless you buy the Cash Savings Account.'],
+ dv:['Income received','Dividends, interest and rent paid into your cash, after the 10% withholding tax.'],
+ pl:['Total profit / loss','Total value minus everything you have put in (the starting ◎10,000 plus top-ups and salary moved in). Includes unrealised gains.'],
+ abtv:['Total value','Cash plus the market value of your holdings.'],abpl:['Profit / loss','Your gain or loss against everything you have put in, in tokens and percent.'],
+ bt:['Real or simulated?','REAL NEWS is a dated, paraphrased real headline (refreshed daily, not live). SIMULATED EVENT is one of the made-up events this app can trigger.'],
+ bh:['Headline','A real-world or simulated story. The chips below show which fictional assets that kind of event would lift (▲) or hit (▼).'],
+ bp:['Previous story','Go back one headline.'],bn:['Next story','Skip to the next headline.'],bpa:['Pause','Stops the headlines rotating every 7 seconds so you can read.'],
+ bgo:['Try it here','Fires the matching world event in the simulator so you can watch how it moves prices.'],
+ clock:['Simulated time','Each tick is one simulated minute. A simulated trading day is 390 ticks; dividends arrive every 90 ticks.'],
+ news:['Market news','Company-specific headlines. They jump one price suddenly, like real earnings surprises.'],
+ speed:['Speed','How fast simulated time runs. Pause to think before trading; Fast to see long-term effects quickly.'],
+ bigp:['Latest value','The most recent price (or portfolio value), with the change over the range shown on the chart.'],
+ bigc:['Change','How much the chart line has moved over the visible range.'],
+ cw:['Chart','Hover or drag to read past values. Dashed lines show your average cost and any open limit or stop orders.'],
+ tip:['Tip','A rotating investing tip. It changes every 25 ticks.'],
+ qty:['Quantity','How many shares to buy, sell or swap. Use 25%, 50% or Max to fill it for you.'],
+ trig:['Order price','The price your limit or stop order waits for. It fills automatically on a later tick when the price reaches it.'],
+ tp:['Bid / ask','You buy at the higher ask and sell at the lower bid. The gap is the spread, a hidden cost of trading.'],
+ tf:['Fee','A 0.1% commission on every trade. Small, but it adds up if you trade often.'],
+ tt2:['Order total','What a buy would cost right now, including the fee.'],
+ own:['You own','How many shares of this asset you hold.'],
+ swapto:['Swap target','The asset you want to switch into.'],
+ swapbtn:['Swap shares','Sells the quantity above and buys as much of the chosen asset as the money covers, in one step. You pay two fees and tax on any gain.'],
+ sellall:['Sell everything','Sells every holding at the bid price and leaves you in cash. Tap twice to confirm.'],
+ topup:['Add tokens','Adds ◎3,000 cash. It counts as money you put in, so it never shows up as profit.'],
+ reset:['Reset','Starts again with ◎10,000 and fresh prices. Everything else is wiped. Tap twice to confirm.'],
+ rt:['Latest activity','Your most recent buys, sells and dividends.'],
+ sb:['Your scorecard','Your return compared with simply holding an equal slice of every asset from the start, plus all the fees you have paid.'],
+ bm:['Business mood','World events change business income: a slump cuts salary, a boom raises it, for a while.'],
+ bw:['Salary wallet','Salary your businesses have earned. Move it into investing cash, or spend it on more businesses.'],
+ br:['Salary per tick','How much all your businesses pay every simulated minute, after any boom or slump.'],
+ bl:['Earned so far','Total salary your businesses have ever paid you.'],
+ bsh:['Work a shift','Earn a quick bonus straight into your salary wallet: 1 token plus three ticks of business salary.'],
+ bmv:['Move salary','Moves up to ◎1,500 a simulated day from your salary wallet into investing cash. It counts as money put in, not profit.'],
+ evsel:['Choose an event','Pick a world event, guess which assets win and lose, then press Trigger event to check.'],
+ evgo:['Trigger event','Fires the chosen event. Prices jump at once, then drift further over the next 8 ticks.'],
+ autobtn:['Auto-invest','When on, a bot buys the expected winners and sells the expected losers after every world event. Set how much cash it uses in the Strategy lab.'],
+ evs:['Event log','Recent world events and how much each asset moved because of them.'],
+ ords:['Open orders','Limit and stop orders waiting for their price. Cancel any you no longer want.'],
+ msg:['Messages','What just happened with your last action, or why it could not go through.'],
+ lc:['Lessons','Tap a lesson title to open it. General education, not financial advice.']};
+const XDATA={
+ m:{a:['Asset price','Shows the price history of the selected asset.'],pf:['My portfolio','Shows your total value over time. The dashed line is your starting ◎10,000.'],ix:['Market index','An equal-weight blend of all twelve assets, starting at 100. It shows how the whole market is doing.']},
+ r:{60:['Last 60 ticks','Zooms in on the most recent hour of simulated time.'],150:['Last 150 ticks','A medium view of recent price moves.'],400:['Max','All the price history the app keeps, up to 400 ticks.']},
+ o:{m:['Market order','Trades straight away at the current bid or ask. Always fills, but you take today’s price.'],l:['Limit order','You set the worst price you accept. A limit buy waits for the price to fall to it; a limit sell waits for it to rise.'],st:['Stop order','Waits for the price to cross a level, then trades. A stop sell below the price is a stop-loss that caps your loss.']},
+ p:{25:['25%','Fills in a quarter of what you could buy with your cash (or of what you own).'],50:['50%','Fills in half of what you could buy with your cash (or of what you own).'],100:['Max','Fills in the most you can buy with your cash, or all the shares you own.']},
+ t:{h:['Holdings','What you own now, your average cost, and unrealised profit or loss.'],x:['Transaction history','Every buy, sell, dividend and top-up, with fees and realised profit or loss.']},
+ l:{bh:['Buy and hold','Keep good assets for a long time and ignore daily noise. Fewer fees, fewer panic decisions.'],ix:['Index investing','Own a little of everything instead of picking winners. One-tap tools to buy the index.'],fa:['Fundamental analysis','Judge an asset by its earnings, growth, debt and dividends, using P/E and PEG.'],ta:['Technical analysis','Read moving averages and RSI from past prices. Evidence it predicts anything is weak.'],dt:['Day trading','Your trade count, win rate and fees compared with just holding. Most real day traders lose money.'],au:['Auto-invest on news','Let a bot trade on world events and see how much of the move it actually catches.'],rw:['Real-world costs','Switch spreads, taxes and thin markets on or off to see what each one costs you.'],in:['Income assets','Assets that pay you interest, rent or dividends every 90 ticks.']},
+ a:{ix25:['Invest 25% in the index','Splits a quarter of your cash equally across all twelve assets.'],ix50:['Invest 50% in the index','Splits half your cash equally across all twelve assets.'],ix100:['Invest all cash in the index','Splits all your cash equally across all twelve assets.'],ixc:['Show index chart','Switches the chart to the market index.'],ta:['Moving averages','Draws the 20-tick and 50-tick average prices on the chart as dashed lines.'],autoon:['Auto-invest switch','Turns the news-trading bot on or off.'],ap10:['10% per event','The bot spends 10% of your cash on each event.'],ap25:['25% per event','The bot spends 25% of your cash on each event.'],ap50:['50% per event','The bot spends 50% of your cash on each event.'],rlsp:['Spreads','When on, you buy at the ask and sell at the bid, like a real market.'],rltx:['Taxes','When on, 20% of realised profit is taxed when you sell, losses carry forward, and 10% of income is withheld.'],rllq:['Thin markets','When on, each order can only fill up to a set amount; bigger orders fill in parts.'],inc25:['Build an income portfolio','Splits 25% of your cash across savings, bonds, property and dividend shares.'],inc50:['Build an income portfolio','Splits 50% of your cash across savings, bonds, property and dividend shares.']},
+ k:{inc:['Fix: invest in income','Puts 25% of your cash into income-paying assets.'],bot:['Fix: auto-invest off','Turns off the news-trading bot.'],sal:['Fix: move salary','Moves salary from your wallet into investing cash.'],chk:['Check-ups','Runs a quick scan every 300 ticks and shows your score.']},
+ tab:{mkt:['Markets','Real and simulated headlines, plus every asset with its price and trend.'],trade:['Trade','The chart and order form for the selected asset.'],pf:['Portfolio','Your totals, settings, holdings and history.'],explore:['Explore','Strategy lab, world events and the Business Empire game.'],learn:['Learn','Twelve short lessons on investing.']},
+ go:{tt:['Trade','Scrolls to the order form.'],hold:['Holdings','Scrolls to what you own.'],lab:['Strategy lab','Scrolls to the strategy tools.'],biz:['Business Empire','Scrolls to the business game.'],events:['World events','Scrolls to the event trigger.'],learn:['Lessons','Scrolls to the lessons.']}};
+const XTH={'Asset':'The ticker symbol of the asset.','Shares':'How many shares.','Avg cost':'Your average price paid per share, including earlier buys. Your break-even point.','Price':'The current market price per share.','Value':'Shares times the current price.','Profit / loss':'Unrealised gain or loss: (price − average cost) × shares. It only becomes real when you sell.','%':'Percentage gain or loss against your average cost.','Time':'The tick when it happened.','Side':'Buy, sell, dividend or top-up. (auto) means the bot did it; (limit) and (stop) are waiting orders that filled.','Fee':'The 0.1% commission paid.','Total':'Cash that moved: paid for a buy, received for a sell or dividend.','Realised P/L':'Locked-in profit or loss from a sale, after fees and tax.','Earnings/share':'Yearly profit divided by the number of shares (made-up figures here).','P/E':'Price divided by earnings per share: how many years of profit you pay for. Lower can mean cheaper.','Growth %':'Expected yearly growth in earnings.','PEG':'P/E divided by growth. Under about 2 looks cheap for its growth; over 3.5 looks expensive.','Debt':'How much the company has borrowed. High debt adds risk when interest rates rise.','Yield %':'Yearly income paid as a percentage of the price.','Reading':'A plain-English verdict from the PEG ratio. Prices here do not follow fundamentals, so it is practice only.','Type':'The kind of asset.','Income % a year':'Interest, rent or dividends paid each year, as a percentage of the price.','Price risk':'How much the price swings: low, medium or high.','Bid':'The price you sell at.','Ask':'The price you buy at.','Spread %':'The gap between bid and ask. Rarely traded assets have wider spreads.','Max per order':'The most shares one order can fill at the quoted price in a thin market.'};
+function xAsset(s){const d=D.find(x=>x.s==s);if(!d)return null;const p=P(s),c=(p/S.open[s]-1)*100,o=S.pos[s],vl=d.v>.008?'very high':d.v>.0045?'high':d.v>.003?'medium':'low';
+ return [`${s} · ${d.n}`,`${SEC[s]}. Price ${f(p)}, ${pc(c)} since the start. Volatility ${vl}.${d.y?' Pays about '+f(d.y*400,1)+'% a year in income.':' Pays no income.'} ${o?`You own ${o.q} at an average of ${f(o.c)}.`:'You own none.'} ${isMob()?'Tap to trade it.':'Click to chart and trade it.'}`]}
+function xFor(t){if(!t||!t.closest||t.closest('#xtip,#tour'))return null;
+ const th=t.closest('th');if(th){const k=th.textContent.trim();if(XTH[k])return [k,XTH[k]]}
+ for(let el=t,i=0;el&&el!==document.body&&i<8;el=el.parentElement,i++){
+  const ds=el.dataset||{};
+  if(el.id=='buy'||el.id=='sell'){const b=el.id=='buy';return otype=='m'?[b?'Buy':'Sell',b?`Buys the quantity at the ask price (${f(xp(sel,true))}) plus the 0.1% fee.`:`Sells the quantity at the bid price (${f(xp(sel,false))}). Profit or loss becomes realised, and 20% tax is due on gains.`]:[(otype=='l'?'Limit ':'Stop ')+(b?'buy':'sell'),'Places a waiting order at your price. Nothing trades until the price reaches it.']}
+  if(/^bb\d$/.test(el.id)){const b=BZ[+el.id.slice(2)];return ['Buy '+b[1],`Pays ${f(b[3])} salary per tick each. Paid from your salary wallet first, then cash. Each one costs 15% more than the last.`]}
+  if(/^bm\d$/.test(el.id)){const b=BZ[+el.id.slice(2)];return ['Hire a manager',`Doubles the salary from all your ${b[1]}s. Costs 8 times the base price, once.`]}
+  if(ds.x)return ['Cancel order','Removes this waiting order. Nothing has traded yet.'];
+  if(ds.k&&ds.k.startsWith('mgr'))return ['Fix: hire a manager','Doubles that business’s income.'];
+  for(const k of ['m','r','o','p','t','l','a','k','tab','go'])if(ds[k]!=null&&XDATA[k][ds[k]])return XDATA[k][ds[k]];
+  if(ds.s){const x=xAsset(ds.s);if(x)return x}
+  if(el.classList&&el.classList.contains('spk'))return ['Sparkline','The last 40 price ticks. Green if the price is higher than at the start of the line, red if lower.'];
+  if(el.classList&&el.classList.contains('alloc'))return ['Allocation','How your total value is split between cash and each holding. A big single block means concentrated risk.'];
+  if(el.classList&&el.classList.contains('kv')){const v=el.querySelector('[id]');if(v&&XID[v.id])return XID[v.id]}
+  if(el.classList&&el.classList.contains('stat')){const v=el.querySelector('[id]');if(v&&XID[v.id])return XID[v.id]}
+  if(el.tagName=='SUMMARY'&&el.closest('#lc'))return ['Lesson','Tap to open or close this lesson.'];
+  if(el.id&&XID[el.id])return XID[el.id];
+  if(el.id=='bc'||el.id=='bx')return XID.bh;
+ }return null}
+let XON=true,xT=0,xHide=0,xLast=null,ptype='mouse';try{XON=localStorage.getItem('pt-explain')!='0'}catch(e){}
+function xLabel(){$('xpl').textContent='Explain: '+(XON?'on':'off');$('xpl').setAttribute('aria-pressed',XON)}
+function xShow(t,x,y){const tip=$('xtip');if(!XON||!$('tour').hidden){xOff();return}const c=xFor(t);if(!c){xOff();return}
+ $('xtt').textContent=c[0];$('xtx').textContent=c[1];tip.hidden=false;const w=tip.offsetWidth,h=tip.offsetHeight,vw=innerWidth,vh=innerHeight;
+ let L=Math.min(Math.max(12,x+14),vw-w-12),Tp=y+18;if(Tp+h>vh-(isMob()?90:12))Tp=Math.max(12,y-h-14);tip.style.left=L+'px';tip.style.top=Tp+'px'}
+function xOff(){clearTimeout(xT);$('xtip').hidden=true;xLast=null}
+document.addEventListener('pointerdown',e=>{ptype=e.pointerType||'mouse'},true);
+document.addEventListener('pointerover',e=>{if(e.pointerType!='mouse'||!XON)return;const c=xFor(e.target);if(!c){xOff();return}
+ if(xLast&&c[0]==xLast[0]&&!$('xtip').hidden)return;xLast=c;clearTimeout(xT);const {clientX:x,clientY:y}=e,t=e.target;xT=setTimeout(()=>xShow(t,x,y),380)});
+document.addEventListener('pointerleave',xOff);
+document.addEventListener('click',e=>{if(!XON)return;if(ptype=='mouse'){if(!$('xtip').hidden)setTimeout(()=>{const r=$('xtip').getBoundingClientRect();xShow(e.target,r.left-14,r.top-18)},0);return}
+ const t=e.target,x=e.clientX,y=e.clientY;setTimeout(()=>{xShow(t,x,y);clearTimeout(xHide);xHide=setTimeout(xOff,5000)},30)},true);
+document.addEventListener('focusin',e=>{if(!XON||!e.target.matches||!e.target.matches(':focus-visible'))return;const r=e.target.getBoundingClientRect();xShow(e.target,r.left,r.bottom-6)});
+document.addEventListener('focusout',()=>{if(ptype=='mouse'&&$('xtip').hidden===false&&!xLast)xOff()});
+addEventListener('scroll',()=>{if(ptype!='mouse')xOff()},{passive:true});
+$('xpl').onclick=()=>{XON=!XON;try{localStorage.setItem('pt-explain',XON?'1':'0')}catch(e){}xLabel();snd('tab');if(XON){const r=$('xpl').getBoundingClientRect();setTimeout(()=>xShow($('xpl'),r.left,r.bottom-6),0)}else xOff()};xLabel();
 try{if(!localStorage.getItem('pt-toured'))setTimeout(()=>tshow(0),700)}catch(e){}
 </script>
 </body>
