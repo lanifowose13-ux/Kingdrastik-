@@ -12,7 +12,7 @@ const MOOD_LIGHT: Record<string, string> = {
   sleepy: '#9fb4ff', sulking: '#c9b8ff', furious: '#ff5a4a',
 }
 const SAYS: Record<string, string> = {
-  regal: 'He is surveying her kingdom.', smug: 'He is insufferably pleased with himself.',
+  regal: 'He is surveying his kingdom.', smug: 'He is insufferably pleased with himself.',
   playful: 'He wants to pounce on something.', hangry: 'He is hungry, and dramatic about it.',
   sleepy: 'He is fighting a yawn.', sulking: 'He is sulking, magnificently.', furious: 'He is roaring at everything.',
 }
