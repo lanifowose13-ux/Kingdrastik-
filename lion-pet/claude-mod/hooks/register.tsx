@@ -12,9 +12,9 @@ const MOOD_LIGHT: Record<string, string> = {
   sleepy: '#9fb4ff', sulking: '#c9b8ff', furious: '#ff5a4a',
 }
 const SAYS: Record<string, string> = {
-  regal: 'She is surveying her kingdom.', smug: 'She is insufferably pleased with herself.',
-  playful: 'She wants to pounce on something.', hangry: 'She is hungry, and dramatic about it.',
-  sleepy: 'She is fighting a yawn.', sulking: 'She is sulking, magnificently.', furious: 'She is roaring at everything.',
+  regal: 'He is surveying her kingdom.', smug: 'He is insufferably pleased with himself.',
+  playful: 'He wants to pounce on something.', hangry: 'He is hungry, and dramatic about it.',
+  sleepy: 'He is fighting a yawn.', sulking: 'He is sulking, magnificently.', furious: 'He is roaring at everything.',
 }
 
 const rev = atom({ plugin: 'drastik', key: 'rev' } as const, 0)
@@ -78,7 +78,7 @@ export const register: Register = on => {
 
   on('command.run', { command: 'lion' }, async $ => {
     await $.ui.open({ id: PANE, title: 'Drastik' })
-    return { text: 'Drastik is in her pane.' }
+    return { text: 'Drastik is in his pane.' }
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
