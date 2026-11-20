@@ -1,0 +1,1 @@
+{ "name": "drastik", "version": "0.1.0", "description": "Drastik, a proud, sassy lion pet, animated in a pane beside the chat", "types": "./types/index.d.ts", "license": "MIT" }
