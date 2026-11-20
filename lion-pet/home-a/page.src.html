@@ -1,0 +1,238 @@
+<title>Drastik the Lion</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: one centred card on a savanna-dusk ground. Lion on top, needs, actions, speech bubble. */
+:root {
+  --bg: #eef1ec; --card: #f8faf6; --ink: #1d2a26; --muted: #5d6c66; --line: #d3dad2;
+  --gold: #c4860f; --gold-ink: #fff9ec; --fur: #e2a43a; --mane: #a8620f; --dusk: #3f5b73;
+  --good: #3f8a5a; --warn: #c98a12; --bad: #b8452f;
+  --display: 'Bricolage Grotesque', 'Trebuchet MS', system-ui, sans-serif;
+  --body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11181c; --card: #1a2429; --ink: #e8ece6; --muted: #9db0a8; --line: #2c3a41;
+    --gold: #e3a63a; --gold-ink: #1c1405; --fur: #e6ac45; --mane: #b86f17; --dusk: #8fb0c9;
+    --good: #5fb87f; --warn: #e3a63a; --bad: #e46a52; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11181c; --card: #1a2429; --ink: #e8ece6; --muted: #9db0a8; --line: #2c3a41;
+  --gold: #e3a63a; --gold-ink: #1c1405; --fur: #e6ac45; --mane: #b86f17; --dusk: #8fb0c9;
+  --good: #5fb87f; --warn: #e3a63a; --bad: #e46a52; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45;
+  padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+h1 { font-family: var(--display); font-weight: 800; font-size: 1.9rem; line-height: 1; margin: 0; text-wrap: balance; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+.tag.mood { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
+.stage { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 14px 14px 6px; position: relative; overflow: hidden; }
+#lion { width: 100%; max-width: 280px; margin: 0 auto; display: block; transform-origin: 50% 90%; }
+.bubble { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; min-height: 3.3em; font-weight: 500; position: relative; }
+.bubble::before { content: ""; position: absolute; top: -7px; left: 36px; width: 12px; height: 12px; background: var(--card); border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: rotate(45deg); }
+.bars { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.bar { min-width: 0; }
+.bar label { display: flex; justify-content: space-between; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.track { height: 9px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.fill { height: 100%; border-radius: 99px; background: var(--good); transition: width .5s ease, background .3s; }
+.fill.mid { background: var(--warn); } .fill.low { background: var(--bad); } .fill.bond { background: var(--dusk); }
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+button { font: inherit; font-weight: 700; padding: 12px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; min-width: 0; }
+button:hover:not(:disabled) { border-color: var(--gold); }
+button:focus-visible { outline: 3px solid var(--dusk); outline-offset: 2px; }
+button:disabled { color: var(--muted); cursor: default; }
+button small { display: block; font-weight: 500; font-size: .7rem; min-height: 1em; }
+.foot { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: .8rem; color: var(--muted); flex-wrap: wrap; }
+.foot label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.note { font-size: .78rem; color: var(--muted); }
+/* mood animation */
+@keyframes breathe { 50% { transform: scale(1.025); } }
+@keyframes bounce { 40% { transform: translateY(-14px) rotate(-2deg); } 70% { transform: translateY(0) rotate(2deg); } }
+@keyframes shake { 20% { transform: translateX(-4px); } 60% { transform: translateX(4px); } }
+@keyframes roar { 30% { transform: scale(1.08); } 50% { transform: scale(1.08) translateX(-3px); } 70% { transform: scale(1.08) translateX(3px); } }
+@keyframes drift { 0% { opacity: 0; transform: translate(0, 0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -22px); } }
+@keyframes twinkle { 50% { opacity: .2; } }
+.m-regal #lion, .m-sleepy #lion { animation: breathe 4s ease-in-out infinite; }
+.m-smug #lion { animation: breathe 3s ease-in-out infinite; }
+.m-playful #lion { animation: bounce 1s ease-in-out infinite; }
+.m-hangry #lion, .m-sulking #lion { animation: shake 1.8s ease-in-out infinite; }
+.m-furious #lion { animation: roar .9s ease-in-out infinite; }
+.zz { animation: drift 2.4s ease-in infinite; } .zz:nth-of-type(2) { animation-delay: 1.2s; }
+.spark { animation: twinkle 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<main class="m-regal" id="app">
+  <header>
+    <h1 id="name">Drastik</h1>
+    <div class="tags"><span class="tag" id="stage">Cub</span><span class="tag mood" id="mood">Regal</span></div>
+  </header>
+  <div class="stage"><div id="art"></div></div>
+  <div class="bubble" id="bubble" aria-live="polite">...</div>
+  <div class="bars" id="bars"></div>
+  <div class="actions" id="actions"></div>
+  <div class="foot">
+    <label for="ai"><input type="checkbox" id="ai"> Let Claude write his lines</label>
+    <span class="note" id="note"></span>
+  </div>
+</main>
+
+<script>
+/*CORE*/
+
+const $ = (id) => document.getElementById(id);
+const ACTIONS = [['feed', 'Feed'], ['play', 'Play'], ['nap', 'Nap'], ['groom', 'Groom'], ['praise', 'Praise'], ['roar', 'Roar']];
+const NEEDS = [['hunger', 'Hunger'], ['energy', 'Energy'], ['fun', 'Fun'], ['pride', 'Pride']];
+const STAGE_LOOK = {
+  cub: { n: 8, r: 9, d: 40, crown: false }, teen: { n: 10, r: 16, d: 46, crown: false },
+  adult: { n: 12, r: 20, d: 52, crown: false }, king: { n: 14, r: 23, d: 56, crown: true },
+};
+const EYE = {
+  regal: { lid: 5, a: 0, pupil: 0, mouth: 'smile' }, smug: { lid: 6, a: -2, pupil: 3, mouth: 'smirk' },
+  playful: { lid: 0, a: -2, pupil: 0, mouth: 'open', big: true }, hangry: { lid: 1, a: 7, pupil: 0, mouth: 'flat' },
+  sleepy: { closed: true, mouth: 'small' }, sulking: { lid: 3, a: -7, pupil: -3, mouth: 'frown' },
+  furious: { lid: 0, a: 12, pupil: 0, mouth: 'roar' },
+};
+
+function lionSVG(stage, m) {
+  const s = STAGE_LOOK[stage] || STAGE_LOOK.cub, e = EYE[m] || EYE.regal, cx = 100, cy = 108;
+  let mane = '';
+  for (let i = 0; i < s.n; i++) {
+    const t = (i / s.n) * Math.PI * 2;
+    mane += `<circle cx="${(cx + Math.cos(t) * s.d).toFixed(1)}" cy="${(cy + Math.sin(t) * s.d).toFixed(1)}" r="${s.r}" fill="var(--mane)"/>`;
+  }
+  const eye = (side) => {
+    const x = cx + side * 14, y = cy - 4;
+    if (e.closed) return `<path d="M${x - 7} ${y} q7 6 14 0" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    const pr = e.big ? 5 : 3.6, a = e.a * (side > 0 ? -1 : 1);
+    return `<circle cx="${x}" cy="${y}" r="${e.big ? 8.5 : 7}" fill="#fff"/>` +
+      `<circle cx="${x + e.pupil}" cy="${y + 1}" r="${pr}" fill="#1d2a26"/>` +
+      (e.big ? `<circle cx="${x + e.pupil + 1.8}" cy="${y - 1}" r="1.6" fill="#fff"/>` : '') +
+      (e.lid ? `<rect x="${x - 8}" y="${y - 8}" width="16" height="${e.lid + 2}" fill="var(--fur)"/>` : '') +
+      `<line x1="${x - 8}" y1="${y - 11 - a}" x2="${x + 8}" y2="${y - 11 + a}" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/>`;
+  };
+  const my = cy + 18;
+  const mouths = {
+    smile: `<path d="M${cx - 9} ${my} q9 8 18 0" stroke="var(--ink)" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+    smirk: `<path d="M${cx - 8} ${my + 2} q9 3 17 -5" stroke="var(--ink)" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+    open: `<path d="M${cx - 10} ${my - 2} q10 16 20 0z" fill="#7a2a22" stroke="var(--ink)" stroke-width="2"/>`,
+    flat: `<path d="M${cx - 8} ${my + 2} h16" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>`,
+    small: `<path d="M${cx - 5} ${my} q5 3 10 0" stroke="var(--ink)" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
+    frown: `<path d="M${cx - 9} ${my + 5} q9 -8 18 0" stroke="var(--ink)" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+    roar: `<path d="M${cx - 13} ${my - 4} q13 -4 26 0 q-3 22 -13 22 q-10 0 -13 -22z" fill="#7a2a22" stroke="var(--ink)" stroke-width="2"/><path d="M${cx - 8} ${my - 2} v5 M${cx + 8} ${my - 2} v5" stroke="#fff" stroke-width="3"/>`,
+  };
+  const crown = s.crown ? `<path d="M${cx - 22} ${cy - 56} l6 -20 l10 12 l6 -16 l6 16 l10 -12 l6 20z" fill="var(--gold)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>` : '';
+  const extras = m === 'sleepy' ? `<text class="zz" x="${cx + 36}" y="${cy - 44}" font-size="16" font-weight="800" fill="var(--dusk)">z</text><text class="zz" x="${cx + 48}" y="${cy - 58}" font-size="12" font-weight="800" fill="var(--dusk)">z</text>`
+    : m === 'smug' ? `<path class="spark" d="M${cx + 52} ${cy - 40} l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z" fill="var(--gold)"/>` : '';
+  return `<svg id="lion" viewBox="0 0 200 200" role="img" aria-label="${stage} lion, ${m}">` +
+    mane + `<circle cx="${cx - 28}" cy="${cy - 30}" r="11" fill="var(--fur)"/><circle cx="${cx + 28}" cy="${cy - 30}" r="11" fill="var(--fur)"/>` +
+    `<circle cx="${cx - 28}" cy="${cy - 30}" r="5" fill="var(--mane)"/><circle cx="${cx + 28}" cy="${cy - 30}" r="5" fill="var(--mane)"/>` +
+    `<circle cx="${cx}" cy="${cy}" r="38" fill="var(--fur)"/><ellipse cx="${cx}" cy="${cy + 14}" rx="17" ry="13" fill="#f6dcae"/>` +
+    eye(-1) + eye(1) + `<path d="M${cx - 6} ${cy + 6} h12 l-6 7z" fill="#5a2c1b"/>` + (mouths[e.mouth] || mouths.smile) + crown + extras + `</svg>`;
+}
+
+let lion, store = null, lastLook = '', speaking = 0;
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+const valid = (s) => s && typeof s.name === 'string' && s.needs && typeof s.lastTick === 'number' && typeof s.bornAt === 'number';
+
+async function initStore() {
+  try {
+    const c = window.claude;
+    if (!c || !c.use) return;
+    const [db, user] = await Promise.all([withTimeout(c.use('db'), 4000), withTimeout(c.use('user'), 4000)]);
+    const id = db && user ? await user.id() : null;
+    if (id) store = db.collection('data/users/' + id).doc('lion');
+  } catch (e) { store = null; }
+}
+
+async function loadLion() {
+  try { if (store) { const s = await withTimeout(store.get(), 4000); if (s.exists && valid(s.data())) return JSON.parse(JSON.stringify(s.data())); } } catch (e) {}
+  try { const r = JSON.parse(localStorage.getItem('drastik-lion')); if (valid(r)) return r; } catch (e) {}
+  return null;
+}
+
+function saveLion() {
+  const copy = JSON.parse(JSON.stringify(lion));
+  try { localStorage.setItem('drastik-lion', JSON.stringify(copy)); } catch (e) {}
+  try { if (store) store.set(copy).catch(() => {}); } catch (e) {}
+}
+
+function say(text) { $('bubble').textContent = text; }
+
+async function speak(trigger) {
+  const canned = pickLine(lion, trigger);
+  if (!$('ai').checked) return say(canned);
+  const mine = ++speaking;
+  say(canned);
+  try {
+    const sample = window.claude && (await withTimeout(window.claude.use('sample'), 4000));
+    if (!sample) return;
+    const out = await withTimeout(sample(
+      `Write one short line (at most 18 words) spoken by ${lion.name}, a proud, sassy lion pet. Current mood: ${mood(lion, Date.now())}. Event: ${trigger}. ` +
+      `Affectionate sass only: never insult the user, never mention death or being left. Reply with the line only, no quotes.`, { modelTier: 'quick', cache: false }), 6000);
+    const line = String(out.text || '').trim().replace(/^["']|["']$/g, '');
+    const bad = BANNED.some((w) => new RegExp('\\b' + w + '\\b', 'i').test(line));
+    if (mine === speaking && line && line.length <= 160 && !bad) say(line);
+  } catch (e) { /* the canned line stays */ }
+}
+
+function render() {
+  const now = Date.now(), m = mood(lion, now);
+  $('name').textContent = lion.name;
+  $('stage').textContent = lion.stage;
+  $('mood').textContent = m;
+  $('app').className = 'm-' + m;
+  const look = lion.stage + m;
+  if (look !== lastLook) { $('art').innerHTML = lionSVG(lion.stage, m); lastLook = look; }
+  $('bars').innerHTML = NEEDS.map(([k, label]) => {
+    const v = Math.round(lion.needs[k]);
+    return `<div class="bar"><label>${label}<span>${v}</span></label><div class="track"><div class="fill ${v < 30 ? 'low' : v < 60 ? 'mid' : ''}" style="width:${v}%"></div></div></div>`;
+  }).join('') + `<div class="bar" style="grid-column:1/-1"><label>Bond<span>${lion.bond}/200</span></label><div class="track"><div class="fill bond" style="width:${lion.bond / 2}%"></div></div></div>`;
+  for (const [k] of ACTIONS) {
+    const b = $('b-' + k), left = Math.max(0, (lion.cooldowns[k] || 0) - now);
+    b.disabled = left > 0;
+    b.querySelector('small').textContent = left > 0 ? Math.ceil(left / 60000) + 'm' : '';
+  }
+}
+
+function doAction(a) {
+  const now = Date.now(), r = act(tick(lion, now), a, now);
+  lion = r.state;
+  if (r.ok) { saveLion(); speak(a); }
+  render();
+}
+
+function setup() {
+  $('actions').innerHTML = ACTIONS.map(([k, l]) => `<button type="button" id="b-${k}">${l}<small></small></button>`).join('');
+  for (const [k] of ACTIONS) $('b-' + k).addEventListener('click', () => doAction(k));
+  $('ai').addEventListener('change', () => { try { localStorage.setItem('drastik-ai', $('ai').checked ? '1' : '0'); } catch (e) {} });
+  try { $('ai').checked = localStorage.getItem('drastik-ai') === '1'; } catch (e) {}
+  setInterval(() => { lion = tick(lion, Date.now()); render(); }, 30000);
+  setInterval(render, 5000);
+}
+
+(async function start() {
+  lion = createLion(Date.now());
+  setup();
+  render();
+  say('...');
+  await initStore();
+  const saved = await loadLion();
+  const now = Date.now();
+  if (saved) {
+    const away = now - saved.lastTick;
+    lion = tick(saved, now);
+    speak('greet-' + awayGreeting(away));
+  } else {
+    speak('regal');
+  }
+  if (!store) $('note').textContent = 'Saved on this device';
+  saveLion();
+  render();
+})();
+</script>
