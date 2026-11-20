@@ -1,0 +1,17 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node \"$CLAUDE_PROJECT_DIR/lion-pet/home-b/cli.mjs\" status"
+  },
+  "hooks": {
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/lion-pet/home-b/cli.mjs\" event feed" }] }
+    ],
+    "PostToolUseFailure": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/lion-pet/home-b/cli.mjs\" event sulk" }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/lion-pet/home-b/cli.mjs\" event praise" }] }
+    ]
+  }
+}
